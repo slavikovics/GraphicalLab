@@ -1,8 +1,9 @@
-<sukiUi:SukiWindow x:Class="GraphicalEditor.Views.MainWindow"
+<suki:SukiWindow x:Class="GraphicalEditor.Views.MainWindow"
                    xmlns="https://github.com/avaloniaui"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
                    xmlns:vm="using:GraphicalEditor.ViewModels"
-                   xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                   xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    mc:Ignorable="d" 
@@ -16,21 +17,66 @@
                    CanMove="True"
                    CanPin="True"
                    CanResize="True">
-    <sukiUi:SukiWindow.Hosts>
-        <sukiUi:SukiToastHost Manager="{Binding ToastManager}"/>
-    </sukiUi:SukiWindow.Hosts>
-    <StackPanel Margin="10" Spacing="10">
-        <Button Width="100" Command="{Binding ErrorCommand}">
-            Error
-        </Button>
-        <Button Width="100" Command="{Binding WarningCommand}">
-            Warning
-        </Button>
-        <Button Width="100" Command="{Binding InfoCommand}">
-            Info
-        </Button>
-        <Button Width="100" Command="{Binding SuccessCommand}">
-            Success
-        </Button>
-    </StackPanel>
-</sukiUi:SukiWindow>
+    <suki:SukiWindow.Hosts>
+        <suki:SukiToastHost Manager="{Binding ToastManager}"/>
+    </suki:SukiWindow.Hosts>
+    <suki:SukiSideMenu IsSearchEnabled="False">
+        <suki:SukiSideMenu.HeaderContent>
+            <avalonia:MaterialIcon Width="80"
+                            Height="80"
+                            Margin="0 0 0 20"
+                            VerticalAlignment="Center"
+                            Foreground="White"
+                            Kind="Palette"/>
+            </suki:SukiSideMenu.HeaderContent>
+    <suki:SukiSideMenu.Items>
+        <suki:SukiSideMenuItem Header="Lines" Classes="Compact" >
+            <suki:SukiSideMenuItem.Icon>
+                <avalonia:MaterialIcon Width="20"
+                               Height="20"
+                               VerticalAlignment="Center"
+                               Foreground="White"
+                               Kind="VectorLine"/>
+            </suki:SukiSideMenuItem.Icon>
+            <suki:SukiSideMenuItem.PageContent>
+                    <StackPanel Margin="10" Spacing="10">
+                        <Button Width="100" Command="{Binding ErrorCommand}">
+                            Error
+                        </Button>
+                        <Button Width="100" Command="{Binding WarningCommand}">
+                            Warning
+                        </Button>
+                    </StackPanel>
+            </suki:SukiSideMenuItem.PageContent>
+        </suki:SukiSideMenuItem>
+
+        <!-- Other Pages -->
+
+        <suki:SukiSideMenuItem Header="Ellipses" Classes="Compact" >
+            <suki:SukiSideMenuItem.Icon>
+                <avalonia:MaterialIcon Width="20"
+                               Height="20"
+                               VerticalAlignment="Center"
+                               Foreground="White"
+                               Kind="VectorEllipse"/>
+            </suki:SukiSideMenuItem.Icon>
+            <suki:SukiSideMenuItem.PageContent>
+                    <StackPanel Margin="10" Spacing="10">
+                        <Button Width="100" Command="{Binding InfoCommand}">
+                            Info
+                        </Button>
+                        <Button Width="100" Command="{Binding SuccessCommand}">
+                            Success
+                        </Button>
+                    </StackPanel>
+            </suki:SukiSideMenuItem.PageContent>
+        </suki:SukiSideMenuItem>
+
+    </suki:SukiSideMenu.Items>
+
+
+    <suki:SukiSideMenu.HeaderContent>
+        <!-- Header Content -->
+    </suki:SukiSideMenu.HeaderContent>
+    </suki:SukiSideMenu>
+</suki:SukiWindow>

@@ -3,7 +3,8 @@
              x:Class="GraphicalEditor.App"
              xmlns:local="using:GraphicalEditor"
              RequestedThemeVariant="Default"
-             xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI">
+             xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
@@ -11,6 +12,8 @@
     </Application.DataTemplates>
   
     <Application.Styles>
-        <sukiUi:SukiTheme ThemeColor="Blue"  />
+        <FluentTheme />
+        <materialIcons:MaterialIconStyles/>
+        <sukiUi:SukiTheme ThemeColor="Blue"/>
     </Application.Styles>
 </Application>
