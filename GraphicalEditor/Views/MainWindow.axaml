@@ -28,7 +28,7 @@
                             VerticalAlignment="Center"
                             Foreground="White"
                             Kind="Palette"/>
-            </suki:SukiSideMenu.HeaderContent>
+        </suki:SukiSideMenu.HeaderContent>
     <suki:SukiSideMenu.Items>
         <suki:SukiSideMenuItem Header="Lines" Classes="Compact" >
             <suki:SukiSideMenuItem.Icon>
@@ -40,12 +40,8 @@
             </suki:SukiSideMenuItem.Icon>
             <suki:SukiSideMenuItem.PageContent>
                     <StackPanel Margin="10" Spacing="10">
-                        <Button Width="100" Command="{Binding ErrorCommand}">
-                            Error
-                        </Button>
-                        <Button Width="100" Command="{Binding WarningCommand}">
-                            Warning
-                        </Button>
+                        <Image Width="600" Height="600" Source="{Binding Bitmap}">
+                        </Image>
                     </StackPanel>
             </suki:SukiSideMenuItem.PageContent>
         </suki:SukiSideMenuItem>
@@ -73,10 +69,5 @@
         </suki:SukiSideMenuItem>
 
     </suki:SukiSideMenu.Items>
-
-
-    <suki:SukiSideMenu.HeaderContent>
-        <!-- Header Content -->
-    </suki:SukiSideMenu.HeaderContent>
     </suki:SukiSideMenu>
 </suki:SukiWindow>
