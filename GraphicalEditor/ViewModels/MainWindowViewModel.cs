@@ -1,18 +1,95 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using SukiUI.Toasts;
 
 namespace GraphicalEditor.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    private const int BitmapWidth = 300;
+    private const int BitmapHeight = 300;
+
     public ISukiToastManager ToastManager { get; } = new SukiToastManager();
 
-    [ObservableProperty] private WriteableBitmap _bitmap = new(new PixelSize(300, 300), new Vector(300, 300));
+    [ObservableProperty] private WriteableBitmap _bitmap = new(
+        new PixelSize(BitmapWidth, BitmapHeight),
+        new Vector(96, 96),
+        PixelFormat.Bgra8888,
+        AlphaFormat.Premul);
+
+    private Point? _firstPoint;
+
+    public void HandleClick(object? sender, Point point)
+    {
+        if (sender is not Image image)
+            return;
+
+        double scale = image.Bounds.Width / BitmapWidth;
+
+        int x = (int)(point.X / scale);
+        int y = (int)(point.Y / scale);
+
+        ShowToast(
+            "Mouse Clicked",
+            $"X: {x}, Y: {y}",
+            NotificationType.Information);
+
+        if (_firstPoint is null)
+        {
+            _firstPoint = new Point(x, y);
+            SetPixel(x, y);
+        }
+        else
+        {
+            DrawLineDda(_firstPoint.Value, new Point(x, y));
+            _firstPoint = null;
+        }
+
+        image.InvalidateVisual();
+    }
+
+    public unsafe void SetPixel(int x, int y, uint color = 0xFF0000FF)
+    {
+        if (x < 0 || x >= BitmapWidth || y < 0 || y >= BitmapHeight)
+            return;
+
+        using var fb = Bitmap.Lock();
+        uint* buffer = (uint*)fb.Address;
+        int stride = fb.RowBytes / 4;
+
+        buffer[y * stride + x] = color;
+    }
+    
+    public void DrawLineDda(Point start, Point end, uint color = 0xFF0000FF)
+    {
+        double dx = end.X - start.X;
+        double dy = end.Y - start.Y;
+
+        int steps = (int)Math.Max(Math.Abs(dx), Math.Abs(dy));
+        if (steps == 0)
+        {
+            SetPixel((int)start.X, (int)start.Y, color);
+            return;
+        }
+
+        double xIncrement = dx / steps;
+        double yIncrement = dy / steps;
+
+        double x = start.X;
+        double y = start.Y;
+
+        for (int i = 0; i <= steps; i++)
+        {
+            SetPixel((int)Math.Round(x), (int)Math.Round(y), color);
+            x += xIncrement;
+            y += yIncrement;
+        }
+    }
 
     private void ShowToast(string title, string content, NotificationType notificationType)
     {
@@ -24,28 +101,4 @@ public partial class MainWindowViewModel : ViewModelBase
         builder.SetDismissAfter(TimeSpan.FromSeconds(2));
         builder.Queue();
     }
-
-    [RelayCommand]
-    private void Error()
-    {
-        ShowToast("Error", "An error occured", NotificationType.Error);
-    }
-    
-    [RelayCommand]
-    private void Warning()
-    {
-        ShowToast("Warning", "A warning occured", NotificationType.Warning);
-    }
-    
-    [RelayCommand]
-    private void Info()
-    {
-        ShowToast("Info", "An info occured", NotificationType.Information);
-    }
-    
-    [RelayCommand]
-    private void Success()
-    {
-        ShowToast("Success", "A success occured", NotificationType.Success);
-    }   
 }

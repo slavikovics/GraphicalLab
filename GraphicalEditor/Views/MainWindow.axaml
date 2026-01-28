@@ -39,8 +39,11 @@
                                Kind="VectorLine"/>
             </suki:SukiSideMenuItem.Icon>
             <suki:SukiSideMenuItem.PageContent>
-                    <StackPanel Margin="10" Spacing="10">
-                        <Image Width="600" Height="600" Source="{Binding Bitmap}">
+                    <StackPanel Spacing="10">
+                        <Image PointerPressed="InputElement_OnPointerPressed"
+                               Stretch="Uniform"
+                               RenderOptions.BitmapInterpolationMode="None"
+                               Source="{Binding Bitmap}">
                         </Image>
                     </StackPanel>
             </suki:SukiSideMenuItem.PageContent>
@@ -58,12 +61,6 @@
             </suki:SukiSideMenuItem.Icon>
             <suki:SukiSideMenuItem.PageContent>
                     <StackPanel Margin="10" Spacing="10">
-                        <Button Width="100" Command="{Binding InfoCommand}">
-                            Info
-                        </Button>
-                        <Button Width="100" Command="{Binding SuccessCommand}">
-                            Success
-                        </Button>
                     </StackPanel>
             </suki:SukiSideMenuItem.PageContent>
         </suki:SukiSideMenuItem>
