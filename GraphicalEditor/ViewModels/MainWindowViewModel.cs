@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -13,9 +15,10 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private const int BitmapWidth = 300;
     private const int BitmapHeight = 300;
-
+    
     public ISukiToastManager ToastManager { get; } = new SukiToastManager();
-
+    [ObservableProperty] private List<string> _lineTypes = ["Цифровой Дифференциальный Анализатор", "Целочисленный Алгоритм Брезенхема", "Алгоритм Ву"];
+    [ObservableProperty] private int _selectedLineIndex;
     [ObservableProperty] private WriteableBitmap _bitmap = new(
         new PixelSize(BitmapWidth, BitmapHeight),
         new Vector(96, 96),
@@ -46,7 +49,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else
         {
-            DrawLineDda(_firstPoint.Value, new Point(x, y));
+            DrawLineBrezenhem(_firstPoint.Value, new Point(x, y));
             _firstPoint = null;
         }
 
@@ -64,7 +67,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         buffer[y * stride + x] = color;
     }
-    
+
     public void DrawLineDda(Point start, Point end, uint color = 0xFF0000FF)
     {
         double dx = end.X - start.X;
@@ -88,6 +91,31 @@ public partial class MainWindowViewModel : ViewModelBase
             SetPixel((int)Math.Round(x), (int)Math.Round(y), color);
             x += xIncrement;
             y += yIncrement;
+        }
+    }
+
+    public void DrawLineBrezenhem(Point start, Point end, uint color = 0xFF0000FF)
+    {
+        double x = start.X;
+        double y = start.Y;
+        double dx = end.X - start.X;
+        double dy = end.Y - start.Y;
+        double e = dy / dx - 0.5;
+        SetPixel((int)Math.Round(x), (int)Math.Round(y), color);
+        int i = 1;
+
+        while (i <= dx)
+        {
+            if (e >= 0)
+            {
+                y++;
+                e -= 1;
+            }
+
+            x++;
+            e += dy / dx;
+            i++;
+            SetPixel((int)Math.Round(x), (int)Math.Round(y), color);
         }
     }
 
