@@ -6,6 +6,7 @@
                  xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:graphicalEditor="clr-namespace:GraphicalEditor"
                  mc:Ignorable="d"
                  d:DesignWidth="800"
                  d:DesignHeight="450"
@@ -71,7 +72,7 @@
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                         <StackPanel
                                             Orientation="Horizontal" Margin="15 15 0 15">
-                                            <ToggleSwitch Padding="0" Margin="0" />
+                                            <ToggleSwitch Padding="0" Margin="0" IsChecked="{Binding IsGridVisible}"/>
                                             <TextBlock VerticalAlignment="Center">Сетка</TextBlock>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Margin="15 15 0 15">
@@ -86,10 +87,17 @@
                             </Grid>
                             <Border Margin="10 0 5 10" CornerRadius="25" BorderThickness="1" BorderBrush="#353535">
                             <suki:GlassCard Padding="0" CornerRadius="25">
-                                <Image PointerPressed="InputElement_OnPointerPressed"
-                                       Stretch="Uniform"
-                                       RenderOptions.BitmapInterpolationMode="None"
-                                       Source="{Binding Bitmap}" />
+                                <Grid>
+                                    <Image PointerPressed="InputElement_OnPointerPressed"
+                                           Stretch="Uniform"
+                                           RenderOptions.BitmapInterpolationMode="None"
+                                           Source="{Binding Bitmap}" />
+                                    <graphicalEditor:PixelGridOverlay
+                                        BitmapWidth="{Binding BitmapWidth}"
+                                        BitmapHeight="{Binding BitmapHeight}"
+                                        IsHitTestVisible="False"
+                                        IsVisible="{Binding IsGridVisible}"/>
+                                </Grid>
                             </suki:GlassCard>
                             </Border>
                         </StackPanel>

@@ -13,26 +13,32 @@ namespace GraphicalEditor.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private const int BitmapWidth = 300;
-    private const int BitmapHeight = 300;
+    [ObservableProperty] private int _bitmapWidth = 300;
+    [ObservableProperty] private int _bitmapHeight = 300;
     
     public ISukiToastManager ToastManager { get; } = new SukiToastManager();
     [ObservableProperty] private List<string> _lineTypes = ["ЦДА", "Брезенхем", "Ву"];
+    [ObservableProperty] private bool _isGridVisible = true;
     [ObservableProperty] private int _selectedLineIndex;
-    [ObservableProperty] private WriteableBitmap _bitmap = new(
-        new PixelSize(BitmapWidth, BitmapHeight),
-        new Vector(96, 96),
-        PixelFormat.Bgra8888,
-        AlphaFormat.Premul);
+    [ObservableProperty] private WriteableBitmap _bitmap;
 
     private Point? _firstPoint;
+
+    public MainWindowViewModel()
+    {
+        _bitmap = new(
+            new PixelSize(_bitmapWidth, _bitmapHeight),
+            new Vector(96, 96),
+            PixelFormat.Bgra8888,
+            AlphaFormat.Premul);
+    }
 
     public void HandleClick(object? sender, Point point)
     {
         if (sender is not Image image)
             return;
 
-        double scale = image.Bounds.Width / BitmapWidth;
+        double scale = image.Bounds.Width / _bitmapWidth;
 
         int x = (int)(point.X / scale);
         int y = (int)(point.Y / scale);
@@ -58,7 +64,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public unsafe void SetPixel(int x, int y, uint color = 0xFF0000FF)
     {
-        if (x < 0 || x >= BitmapWidth || y < 0 || y >= BitmapHeight)
+        if (x < 0 || x >= _bitmapWidth || y < 0 || y >= _bitmapHeight)
             return;
 
         using var fb = Bitmap.Lock();
