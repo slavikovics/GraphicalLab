@@ -11,9 +11,12 @@
                  d:DesignHeight="450"
                  x:DataType="vm:MainWindowViewModel"
                  MinHeight="300"
-                 MinWidth="650"
+                 BackgroundStyle="GradientSoft"
+                 FontWeight="ExtraBold"
+                 MinWidth="1080"
                  Icon="/Assets/avalonia-logo.ico"
-                 Title="Graphical Editor"
+                 Title="Graphical Lab"
+                 FontFamily="HighlightFontFamily"
                  CanFullScreen="True"
                  CanMinimize="True"
                  CanMove="True"
@@ -24,15 +27,10 @@
     </suki:SukiWindow.Hosts>
     <suki:SukiSideMenu IsSearchEnabled="False">
         <suki:SukiSideMenu.HeaderContent>
-            <avalonia:MaterialIcon Width="80"
-                                   Height="80"
-                                   Margin="0 0 0 20"
-                                   VerticalAlignment="Center"
-                                   Foreground="White"
-                                   Kind="Palette" />
+            <Image Height="150" Width="150" Source="../Assets/logo.png"></Image>
         </suki:SukiSideMenu.HeaderContent>
         <suki:SukiSideMenu.Items>
-            <suki:SukiSideMenuItem Header="Lines" Classes="Compact">
+            <suki:SukiSideMenuItem Header="Отрезки" Classes="Compact">
                 <suki:SukiSideMenuItem.Icon>
                     <avalonia:MaterialIcon Width="20"
                                            Height="20"
@@ -43,32 +41,57 @@
                 <suki:SukiSideMenuItem.PageContent>
                     <ScrollViewer>
                         <StackPanel Spacing="10">
-                            <suki:GlassCard Margin="10 10 5 0">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="4*" />
-                                        <ColumnDefinition Width="4*" />
-                                        <ColumnDefinition Width="4*" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0"
-                                                Orientation="Horizontal">
-                                        <avalonia:MaterialIcon Width="20"
-                                                               HorizontalAlignment="Right"
-                                                               Height="20"
-                                                               Margin="5"
-                                                               Kind="FormatLineStyle" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="5*" />
+                                    <ColumnDefinition Width="5*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border BorderThickness="1" CornerRadius="100" Margin="10 10 5 0" BorderBrush="#353535" Grid.Column="0">
+                                    <suki:GlassCard CornerRadius="100" Height="70">
+                                        <StackPanel HorizontalAlignment="Center"
+                                                    Orientation="Horizontal">
+                                            <avalonia:MaterialIcon Width="20"
+                                                                   HorizontalAlignment="Right"
+                                                                   Height="20"
+                                                                   Margin="5"
+                                                                   Kind="FormatLineStyle" />
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Margin="5">
+                                                Алгоритм построения отрезков:
+                                            </TextBlock>
+                                            <ComboBox SelectedIndex="{Binding SelectedLineIndex}"
+                                                      ItemsSource="{Binding LineTypes}" />
+                                        </StackPanel>
+
+                                    </suki:GlassCard>
+                                </Border>
+                                <Border Grid.Column="1" Margin="5 10 5 0" CornerRadius="100" BorderThickness="1" BorderBrush="#353535">
+                                <suki:GlassCard CornerRadius="100" Height="70" Padding="0">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <StackPanel
+                                            Orientation="Horizontal" Margin="15 15 0 15">
+                                            <ToggleSwitch Padding="0" Margin="0" />
+                                            <TextBlock VerticalAlignment="Center">Сетка</TextBlock>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="15 15 0 15">
+                                            <ToggleSwitch />
+                                            <TextBlock VerticalAlignment="Center">Отладка</TextBlock>
+                                        </StackPanel>
+                                        <Button Margin="30 10 30 10" FontSize="15"
+                                                Content="{avalonia:MaterialIconTextExt Kind=SkipNextCircle, Text=Далее}" />
                                     </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{Binding SelectedLineIndex}"
-                                              ItemsSource="{Binding LineTypes}" />
-                                </Grid>
-                            </suki:GlassCard>
-                            <suki:GlassCard Margin="10 0 5 10">
+                                </suki:GlassCard>
+                                </Border>
+                            </Grid>
+                            <Border Margin="10 0 5 10" CornerRadius="25" BorderThickness="1" BorderBrush="#353535">
+                            <suki:GlassCard Padding="0" CornerRadius="25">
                                 <Image PointerPressed="InputElement_OnPointerPressed"
                                        Stretch="Uniform"
                                        RenderOptions.BitmapInterpolationMode="None"
                                        Source="{Binding Bitmap}" />
                             </suki:GlassCard>
+                            </Border>
                         </StackPanel>
                     </ScrollViewer>
                 </suki:SukiSideMenuItem.PageContent>
@@ -76,7 +99,7 @@
 
             <!-- Other Pages -->
 
-            <suki:SukiSideMenuItem Header="Ellipses" Classes="Compact">
+            <suki:SukiSideMenuItem Header="Эллипсы" Classes="Compact">
                 <suki:SukiSideMenuItem.Icon>
                     <avalonia:MaterialIcon Width="20"
                                            Height="20"

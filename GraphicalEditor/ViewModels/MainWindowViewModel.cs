@@ -17,7 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private const int BitmapHeight = 300;
     
     public ISukiToastManager ToastManager { get; } = new SukiToastManager();
-    [ObservableProperty] private List<string> _lineTypes = ["Цифровой Дифференциальный Анализатор", "Целочисленный Алгоритм Брезенхема", "Алгоритм Ву"];
+    [ObservableProperty] private List<string> _lineTypes = ["ЦДА", "Брезенхем", "Ву"];
     [ObservableProperty] private int _selectedLineIndex;
     [ObservableProperty] private WriteableBitmap _bitmap = new(
         new PixelSize(BitmapWidth, BitmapHeight),
