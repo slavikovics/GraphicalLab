@@ -93,29 +93,39 @@ public partial class MainWindowViewModel : ViewModelBase
             y += yIncrement;
         }
     }
-
+    
     public void DrawLineBrezenhem(Point start, Point end, uint color = 0xFF0000FF)
     {
-        double x = start.X;
-        double y = start.Y;
-        double dx = end.X - start.X;
-        double dy = end.Y - start.Y;
-        double e = dy / dx - 0.5;
-        SetPixel((int)Math.Round(x), (int)Math.Round(y), color);
-        int i = 1;
-
-        while (i <= dx)
+        int x1 = (int)start.X, y1 = (int)start.Y;
+        int x2 = (int)end.X, y2 = (int)end.Y;
+    
+        int dx = Math.Abs(x2 - x1);
+        int dy = Math.Abs(y2 - y1);
+    
+        int sx = (x1 < x2) ? 1 : -1;
+        int sy = (y1 < y2) ? 1 : -1;
+    
+        int err = dx - dy;
+    
+        while (true)
         {
-            if (e >= 0)
+            SetPixel(x1, y1, color);
+        
+            if (x1 == x2 && y1 == y2) break;
+        
+            int e2 = 2 * err;
+        
+            if (e2 > -dy)
             {
-                y++;
-                e -= 1;
+                err -= dy;
+                x1 += sx;
             }
-
-            x++;
-            e += dy / dx;
-            i++;
-            SetPixel((int)Math.Round(x), (int)Math.Round(y), color);
+        
+            if (e2 < dx)
+            {
+                err += dx;
+                y1 += sy;
+            }
         }
     }
 
