@@ -11,15 +11,21 @@ public partial class MainWindow : SukiWindow
     public MainWindow()
     {
         InitializeComponent();
+        Loaded += SetUp;
     }
 
-    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    private void SetUp(object? sender, RoutedEventArgs e)
     {
-        (DataContext as MainWindowViewModel)?.HandleClick(sender, e.GetPosition((Visual)sender));
+        (DataContext as MainWindowViewModel)?.TargetImage = Image;
     }
 
     private void Button_OnClick(object? sender, RoutedEventArgs e)
     {
         (DataContext as MainWindowViewModel)?.ClearBitmap(Image);
+    }
+
+    private void Image_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        (DataContext as MainWindowViewModel)?.HandleClickCommand.Execute(e);
     }
 }

@@ -79,14 +79,19 @@
                                                 <TextBlock Margin="0" Padding="0" VerticalAlignment="Center">Сетка</TextBlock>
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Margin="10 15 0 10">
-                                                <ToggleSwitch />
+                                                <ToggleSwitch IsChecked="{Binding IsDebugEnabled}" />
                                                 <TextBlock VerticalAlignment="Center">Отладка</TextBlock>
                                             </StackPanel>
-                                            <Button Margin="15 10 8 10" FontSize="15">
-                                                <avalonia:MaterialIcon Width="30"
-                                                                       HorizontalAlignment="Right"
-                                                                       Height="30"
-                                                                       Kind="SkipNext" />
+                                            <Button Margin="15 10 8 10" FontSize="15"
+                                                    Padding="5 0 5 0"
+                                                    IsEnabled="{Binding IsNextStepAvailable}"
+                                                    Command="{Binding HandleDebugNextStepCommand}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <avalonia:MaterialIcon Width="30"
+                                                                           Height="30"
+                                                                           Kind="SkipNext" />
+                                                    <TextBlock Margin="0 0 5 0" VerticalAlignment="Center" IsVisible="{Binding IsDebugEnabled}" Text="{Binding StepsCountText}"/>
+                                                </StackPanel>
                                             </Button>
                                             <Button Click="Button_OnClick" Margin="8 10 10 10" FontSize="15">
                                                 <avalonia:MaterialIcon Width="30"
@@ -101,7 +106,7 @@
                             <Border Margin="10 0 5 10" CornerRadius="25" BorderThickness="1" BorderBrush="#353535">
                                 <suki:GlassCard Padding="0" CornerRadius="25">
                                     <Grid>
-                                        <Image PointerPressed="InputElement_OnPointerPressed"
+                                        <Image PointerPressed="Image_OnPointerPressed"
                                                Name="Image"
                                                Stretch="Uniform"
                                                RenderOptions.BitmapInterpolationMode="None"
