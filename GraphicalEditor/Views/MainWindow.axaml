@@ -48,7 +48,8 @@
                                     <ColumnDefinition Width="5*" />
                                 </Grid.ColumnDefinitions>
 
-                                <Border BorderThickness="1" CornerRadius="100" Margin="10 10 5 0" BorderBrush="#353535" Grid.Column="0">
+                                <Border BorderThickness="1" CornerRadius="100" Margin="10 10 5 0" BorderBrush="#353535"
+                                        Grid.Column="0">
                                     <suki:GlassCard CornerRadius="100" Height="70">
                                         <StackPanel HorizontalAlignment="Center"
                                                     Orientation="Horizontal">
@@ -67,38 +68,51 @@
 
                                     </suki:GlassCard>
                                 </Border>
-                                <Border Grid.Column="1" Margin="5 10 5 0" CornerRadius="100" BorderThickness="1" BorderBrush="#353535">
-                                <suki:GlassCard CornerRadius="100" Height="70" Padding="0">
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <StackPanel
-                                            Orientation="Horizontal" Margin="15 15 0 15">
-                                            <ToggleSwitch Padding="0" Margin="0" IsChecked="{Binding IsGridVisible}"/>
-                                            <TextBlock VerticalAlignment="Center">Сетка</TextBlock>
+                                <Border Grid.Column="1" Margin="5 10 5 0" CornerRadius="100" BorderThickness="1"
+                                        BorderBrush="#353535">
+                                    <suki:GlassCard CornerRadius="100" Height="70" Padding="0">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <StackPanel
+                                                Orientation="Horizontal" Margin="5 15 0 10">
+                                                <ToggleSwitch Padding="0" Margin="0"
+                                                              IsChecked="{Binding IsGridVisible}" />
+                                                <TextBlock Margin="0" Padding="0" VerticalAlignment="Center">Сетка</TextBlock>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="10 15 0 10">
+                                                <ToggleSwitch />
+                                                <TextBlock VerticalAlignment="Center">Отладка</TextBlock>
+                                            </StackPanel>
+                                            <Button Margin="15 10 8 10" FontSize="15">
+                                                <avalonia:MaterialIcon Width="30"
+                                                                       HorizontalAlignment="Right"
+                                                                       Height="30"
+                                                                       Kind="SkipNext" />
+                                            </Button>
+                                            <Button Click="Button_OnClick" Margin="8 10 10 10" FontSize="15">
+                                                <avalonia:MaterialIcon Width="30"
+                                                                       HorizontalAlignment="Right"
+                                                                       Height="30"
+                                                                       Kind="Cleaning" />
+                                            </Button>
                                         </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Margin="15 15 0 15">
-                                            <ToggleSwitch />
-                                            <TextBlock VerticalAlignment="Center">Отладка</TextBlock>
-                                        </StackPanel>
-                                        <Button Margin="30 10 30 10" FontSize="15"
-                                                Content="{avalonia:MaterialIconTextExt Kind=SkipNextCircle, Text=Далее}" />
-                                    </StackPanel>
-                                </suki:GlassCard>
+                                    </suki:GlassCard>
                                 </Border>
                             </Grid>
                             <Border Margin="10 0 5 10" CornerRadius="25" BorderThickness="1" BorderBrush="#353535">
-                            <suki:GlassCard Padding="0" CornerRadius="25">
-                                <Grid>
-                                    <Image PointerPressed="InputElement_OnPointerPressed"
-                                           Stretch="Uniform"
-                                           RenderOptions.BitmapInterpolationMode="None"
-                                           Source="{Binding Bitmap}" />
-                                    <graphicalEditor:PixelGridOverlay
-                                        BitmapWidth="{Binding BitmapWidth}"
-                                        BitmapHeight="{Binding BitmapHeight}"
-                                        IsHitTestVisible="False"
-                                        IsVisible="{Binding IsGridVisible}"/>
-                                </Grid>
-                            </suki:GlassCard>
+                                <suki:GlassCard Padding="0" CornerRadius="25">
+                                    <Grid>
+                                        <Image PointerPressed="InputElement_OnPointerPressed"
+                                               Name="Image"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapInterpolationMode="None"
+                                               Source="{Binding Bitmap}" />
+                                        <graphicalEditor:PixelGridOverlay
+                                            BitmapWidth="{Binding BitmapWidth}"
+                                            BitmapHeight="{Binding BitmapHeight}"
+                                            IsHitTestVisible="False"
+                                            IsVisible="{Binding IsGridVisible}" />
+                                    </Grid>
+                                </suki:GlassCard>
                             </Border>
                         </StackPanel>
                     </ScrollViewer>

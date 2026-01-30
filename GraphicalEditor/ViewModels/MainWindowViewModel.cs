@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SukiUI.Toasts;
 
 namespace GraphicalEditor.ViewModels;
@@ -15,7 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     [ObservableProperty] private int _bitmapWidth = 300;
     [ObservableProperty] private int _bitmapHeight = 300;
-    
+
     public ISukiToastManager ToastManager { get; } = new SukiToastManager();
     [ObservableProperty] private List<string> _lineTypes = ["ЦДА", "Брезенхем", "Ву"];
     [ObservableProperty] private bool _isGridVisible = true;
@@ -38,15 +40,11 @@ public partial class MainWindowViewModel : ViewModelBase
         if (sender is not Image image)
             return;
 
-        double scale = image.Bounds.Width / _bitmapWidth;
-
+        double scale = image.Bounds.Width / BitmapWidth;
         int x = (int)(point.X / scale);
         int y = (int)(point.Y / scale);
 
-        ShowToast(
-            "Mouse Clicked",
-            $"X: {x}, Y: {y}",
-            NotificationType.Information);
+        ShowToast("Mouse Clicked", $"X: {x}, Y: {y}", NotificationType.Information);
 
         if (_firstPoint is null)
         {
@@ -64,7 +62,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public unsafe void SetPixel(int x, int y, uint color = 0xFF0000FF)
     {
-        if (x < 0 || x >= _bitmapWidth || y < 0 || y >= _bitmapHeight)
+        if (x < 0 || x >= BitmapWidth || y < 0 || y >= BitmapHeight)
             return;
 
         using var fb = Bitmap.Lock();
@@ -99,7 +97,7 @@ public partial class MainWindowViewModel : ViewModelBase
             y += yIncrement;
         }
     }
-    
+
     public void DrawLineBrezenhem(Point start, Point end, uint color = 0xFF0000FF)
     {
         int x1 = (int)start.X, y1 = (int)start.Y;
@@ -144,5 +142,22 @@ public partial class MainWindowViewModel : ViewModelBase
         builder.SetCanDismissByClicking(true);
         builder.SetDismissAfter(TimeSpan.FromSeconds(2));
         builder.Queue();
+    }
+    
+    public unsafe void ClearBitmap(Image image)
+    {
+        using var fb = Bitmap.Lock();
+        uint* buffer = (uint*)fb.Address;
+        int stride = fb.RowBytes / 4;
+
+        for (int x = 0; x < BitmapWidth; x++)
+        {
+            for (int y = 0; y < BitmapHeight; y++)
+            {
+                buffer[y * stride + x] = 0;
+            }
+        }
+        
+        image.InvalidateVisual();
     }
 }
