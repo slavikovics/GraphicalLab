@@ -26,8 +26,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private bool _isGridVisible = true;
     [ObservableProperty] private int _selectedLineIndex;
     [ObservableProperty] private WriteableBitmap _bitmap;
-
-    private readonly List<Point> _pointsToDraw = [];
+    
+    private readonly List<Pixel> _pointsToDraw = [];
+    private delegate List<Pixel> DrawLineDelegate(Pixel start, Pixel end, uint color);
+    private Dictionary<int, DrawLineDelegate> _lineTypesMatch = null!;
 
     public string StepsCountText
     {
@@ -49,16 +51,29 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private bool _isNextStepAvailable;
 
-    private Point? _firstPoint;
+    private Pixel? _firstPoint;
 
     public MainWindowViewModel()
     {
+        InitializeLines();
         _bitmap = new(
             new PixelSize(_bitmapWidth, _bitmapHeight),
             new Vector(96, 96),
             PixelFormat.Bgra8888,
             AlphaFormat.Premul);
         StepsCountText = "(0)";
+    }
+
+    private void InitializeLines()
+    {
+        _lineTypesMatch = new Dictionary<int, DrawLineDelegate>();
+        var ddaDelegate = new DrawLineDelegate(DrawLineDda);
+        var brezenhemDelegate = new DrawLineDelegate(DrawLineBrezenhem);
+        var wuDelegate = new DrawLineDelegate(DrawLineWu);
+        
+        _lineTypesMatch.Add(0, DrawLineDda);
+        _lineTypesMatch.Add(1, DrawLineBrezenhem);
+        _lineTypesMatch.Add(2, DrawLineWu);
     }
 
     [RelayCommand]
@@ -74,12 +89,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (_firstPoint is null)
         {
-            _firstPoint = new Point(x, y);
-            SetPixel(x, y);
+            _firstPoint = new Pixel(x, y);
+            SetPixel(new Pixel(x, y));
         }
         else
         {
-            var points = DrawLineBrezenhem(_firstPoint.Value, new Point(x, y));
+            SetPixel(new Pixel(x, y));
+            var points = _lineTypesMatch[SelectedLineIndex].Invoke(_firstPoint, new Pixel(x, y), 0xFF0000FF);
             AddPoints(points);
             UpdateBitmap();
             _firstPoint = null;
@@ -97,14 +113,14 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         foreach (var newPoint in _pointsToDraw)
         {
-            SetPixel((int)newPoint.X, (int)newPoint.Y);
+            if (newPoint.Intensity != 0) SetPixel(newPoint);
         }
 
         TargetImage?.InvalidateVisual();
         _pointsToDraw.Clear();
     }
 
-    private void AddPoints(List<Point> points)
+    private void AddPoints(List<Pixel> points)
     {
         if (points.Count == 0) return;
         _pointsToDraw.AddRange(points);
@@ -115,28 +131,29 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public unsafe void SetPixel(int x, int y, uint color = 0xFF0000FF)
+    public unsafe void SetPixel(Pixel pixel)
     {
-        if (x < 0 || x >= BitmapWidth || y < 0 || y >= BitmapHeight)
+        if (pixel.X < 0 || pixel.X >= BitmapWidth || pixel.Y < 0 || pixel.Y >= BitmapHeight)
             return;
 
         using var fb = Bitmap.Lock();
         uint* buffer = (uint*)fb.Address;
         int stride = fb.RowBytes / 4;
 
-        buffer[y * stride + x] = color;
+        buffer[pixel.Y * stride + pixel.X] = pixel.Color;
     }
 
-    public void DrawLineDda(Point start, Point end, uint color = 0xFF0000FF)
+    private List<Pixel> DrawLineDda(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
+        List<Pixel> newPoints = [];
         double dx = end.X - start.X;
         double dy = end.Y - start.Y;
 
         int steps = (int)Math.Max(Math.Abs(dx), Math.Abs(dy));
         if (steps == 0)
         {
-            SetPixel((int)start.X, (int)start.Y, color);
-            return;
+            newPoints.Add(start);
+            return newPoints;
         }
 
         double xIncrement = dx / steps;
@@ -147,47 +164,61 @@ public partial class MainWindowViewModel : ViewModelBase
 
         for (int i = 0; i <= steps; i++)
         {
-            SetPixel((int)Math.Round(x), (int)Math.Round(y), color);
+            newPoints.Add(new Pixel(x, y, color));
             x += xIncrement;
             y += yIncrement;
         }
+
+        return newPoints;
     }
 
-    public List<Point> DrawLineBrezenhem(Point start, Point end, uint color = 0xFF0000FF)
+    public List<Pixel> DrawLineBrezenhem(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
-        List<Point> newPoints = [];
+        List<Pixel> newPoints = [];
         int x1 = (int)start.X, y1 = (int)start.Y;
         int x2 = (int)end.X, y2 = (int)end.Y;
 
+        int x = x1, y = y1;
         int dx = Math.Abs(x2 - x1);
         int dy = Math.Abs(y2 - y1);
+
+        if (dx < dy)
+        {
+            var reversed = DrawLineBrezenhem(start.Swapped(), end.Swapped(), color);
+            foreach (var point in reversed)
+            {
+                point.Swap();
+                newPoints.Add(point);
+            }
+
+            return newPoints;
+        }
+
+        double e = (double)dy / dx - 0.5;
+        newPoints.Add(new Pixel(start.X, start.Y, color));
 
         int sx = (x1 < x2) ? 1 : -1;
         int sy = (y1 < y2) ? 1 : -1;
 
-        int err = dx - dy;
-
-        while (true)
+        for (int i = 1; i <= dx; i++)
         {
-            newPoints.Add(new Point(x1, y1));
-            if (x1 == x2 && y1 == y2) break;
-
-            int e2 = 2 * err;
-
-            if (e2 > -dy)
+            if (e >= 0)
             {
-                err -= dy;
-                x1 += sx;
+                y += sy;
+                e -= 1;
             }
 
-            if (e2 < dx)
-            {
-                err += dx;
-                y1 += sy;
-            }
+            x += sx;
+            e += (double)dy / dx;
+            newPoints.Add(new Pixel(x, y, color));
         }
 
         return newPoints;
+    }
+
+    public List<Pixel> DrawLineWu(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    {
+        return XiaolinWuLineGenerator.DrawLine(start, end, color);
     }
 
     private void ShowToast(string title, string content, NotificationType notificationType)
@@ -225,7 +256,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void HandleDebugNextStep()
     {
         if (!IsDebugEnabled || _pointsToDraw.Count == 0) return;
-        SetPixel((int)_pointsToDraw[0].X, (int)_pointsToDraw[0].Y);
+        SetPixel(_pointsToDraw[0]);
         TargetImage?.InvalidateVisual();
         _pointsToDraw.RemoveAt(0);
         StepsCountText = $"({_pointsToDraw.Count.ToString()})";
