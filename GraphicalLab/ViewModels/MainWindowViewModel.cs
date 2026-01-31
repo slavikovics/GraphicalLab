@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Avalonia;
+﻿using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Lines;
@@ -20,21 +15,23 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IToastManager _toastManager;
     private readonly IWritableBitmapProvider _writableBitmapProvider;
     public ISukiToastManager ToastManager => _toastManager.GetToastManager();
-    
+
     [ObservableProperty] private List<string> _lineTypes = ["ЦДА", "Брезенхем", "Ву"];
+
     private delegate List<Pixel> DrawLineDelegate(Pixel start, Pixel end, uint color);
     private Dictionary<int, DrawLineDelegate> _lineTypesMatch = null!;
-    
     public Image? TargetImage = null;
-    
-    [ObservableProperty] private int _bitmapWidth = 300;
-    [ObservableProperty] private int _bitmapHeight = 300;
-    
+
+    public int BitmapWidth => _writableBitmapProvider.GetBitmapWidth();
+    public int BitmapHeight => _writableBitmapProvider.GetBitmapHeight();
+
     [ObservableProperty] private bool _isGridVisible = true;
     [ObservableProperty] private int _selectedLineIndex;
-    [ObservableProperty] private WriteableBitmap _bitmap;
+    [ObservableProperty] private bool _isNextStepAvailable;
 
+    public WriteableBitmap Bitmap => _writableBitmapProvider.GetBitmap();
     private readonly List<Pixel> _pointsToDraw = [];
+    private Pixel? _firstPoint;
 
     public string StepsCountText
     {
@@ -54,20 +51,11 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    [ObservableProperty] private bool _isNextStepAvailable;
-
-    private Pixel? _firstPoint;
-
     public MainWindowViewModel(IToastManager toastManager, IWritableBitmapProvider writableBitmapProvider)
     {
         _toastManager = toastManager;
         _writableBitmapProvider = writableBitmapProvider;
         InitializeLines();
-        _bitmap = new(
-            new PixelSize(_bitmapWidth, _bitmapHeight),
-            new Vector(96, 96),
-            PixelFormat.Bgra8888,
-            AlphaFormat.Premul);
         StepsCountText = "(0)";
     }
 
@@ -97,30 +85,24 @@ public partial class MainWindowViewModel : ViewModelBase
         if (_firstPoint is null)
         {
             _firstPoint = new Pixel(x, y);
-            SetPixel(new Pixel(x, y));
+            _writableBitmapProvider.SetPixel(new Pixel(x, y));
         }
         else
         {
-            SetPixel(new Pixel(x, y));
+            _writableBitmapProvider.SetPixel(new Pixel(x, y));
             var points = _lineTypesMatch[SelectedLineIndex].Invoke(_firstPoint, new Pixel(x, y), 0xFF0000FF);
             AddPoints(points);
-            UpdateBitmap();
             _firstPoint = null;
         }
 
         TargetImage?.InvalidateVisual();
     }
 
-    private void UpdateBitmap()
-    {
-        if (!IsDebugEnabled) DrawAllPoints();
-    }
-
     private void DrawAllPoints()
     {
         foreach (var newPoint in _pointsToDraw)
         {
-            if (newPoint.Intensity != 0) SetPixel(newPoint);
+            if (newPoint.Intensity != 0) _writableBitmapProvider.SetPixel(newPoint);
         }
 
         TargetImage?.InvalidateVisual();
@@ -136,18 +118,10 @@ public partial class MainWindowViewModel : ViewModelBase
             IsNextStepAvailable = true;
             StepsCountText = $"({_pointsToDraw.Count.ToString()})";
         }
-    }
-
-    public unsafe void SetPixel(Pixel pixel)
-    {
-        if (pixel.X < 0 || pixel.X >= BitmapWidth || pixel.Y < 0 || pixel.Y >= BitmapHeight)
-            return;
-
-        using var fb = Bitmap.Lock();
-        uint* buffer = (uint*)fb.Address;
-        int stride = fb.RowBytes / 4;
-
-        buffer[pixel.Y * stride + pixel.X] = pixel.Color;
+        else
+        {
+            DrawAllPoints();
+        }
     }
 
     private List<Pixel> DrawLineDda(Pixel start, Pixel end, uint color = 0xFF0000FF)
@@ -155,12 +129,12 @@ public partial class MainWindowViewModel : ViewModelBase
         return DdaLineGenerator.DrawLine(start, end, color);
     }
 
-    public List<Pixel> DrawLineBrezenhem(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    private List<Pixel> DrawLineBrezenhem(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
         return BrezenhemLineGenerator.DrawLine(start, end, color);
     }
 
-    public List<Pixel> DrawLineWu(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    private List<Pixel> DrawLineWu(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
         return XiaolinWuLineGenerator.DrawLine(start, end, color);
     }
@@ -170,32 +144,17 @@ public partial class MainWindowViewModel : ViewModelBase
         _pointsToDraw.Clear();
         IsNextStepAvailable = false;
         StepsCountText = $"({_pointsToDraw.Count.ToString()})";
-        using var fb = Bitmap.Lock();
-        uint* buffer = (uint*)fb.Address;
-        int stride = fb.RowBytes / 4;
-
-        for (int x = 0; x < BitmapWidth; x++)
-        {
-            for (int y = 0; y < BitmapHeight; y++)
-            {
-                buffer[y * stride + x] = 0;
-            }
-        }
-
-        image.InvalidateVisual();
+        _writableBitmapProvider.ClearBitmap(image);
     }
 
     [RelayCommand]
     private void HandleDebugNextStep()
     {
         if (!IsDebugEnabled || _pointsToDraw.Count == 0) return;
-        SetPixel(_pointsToDraw[0]);
+        _writableBitmapProvider.SetPixel(_pointsToDraw[0]);
         TargetImage?.InvalidateVisual();
         _pointsToDraw.RemoveAt(0);
         StepsCountText = $"({_pointsToDraw.Count.ToString()})";
-        if (_pointsToDraw.Count == 0)
-        {
-            IsNextStepAvailable = false;
-        }
+        if (_pointsToDraw.Count == 0) IsNextStepAvailable = false;
     }
 }
