@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GraphicalEditor;
+namespace GraphicalLab;
 
 public class Pixel
 {

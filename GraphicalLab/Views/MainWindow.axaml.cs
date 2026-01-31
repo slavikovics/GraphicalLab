@@ -1,10 +1,10 @@
 using Avalonia;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using GraphicalEditor.ViewModels;
+using GraphicalLab.ViewModels;
 using SukiUI.Controls;
 
-namespace GraphicalEditor.Views;
+namespace GraphicalLab.Views;
 
 public partial class MainWindow : SukiWindow
 {

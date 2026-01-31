@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using Avalonia.Media;
 
-namespace GraphicalEditor;
+namespace GraphicalLab;
 
 public static class XiaolinWuLineGenerator
 {

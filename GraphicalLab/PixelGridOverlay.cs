@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 
-namespace GraphicalEditor;
+namespace GraphicalLab;
 
 public class PixelGridOverlay : Control
 {

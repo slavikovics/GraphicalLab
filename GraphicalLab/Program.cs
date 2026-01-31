@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace GraphicalEditor;
+namespace GraphicalLab;
 
 sealed class Program
 {

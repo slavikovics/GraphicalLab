@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace GraphicalEditor.ViewModels;
+namespace GraphicalLab.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject
 {

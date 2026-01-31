@@ -12,7 +12,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SukiUI.Toasts;
 
-namespace GraphicalEditor.ViewModels;
+namespace GraphicalLab.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {

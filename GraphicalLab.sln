@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphicalEditor", "GraphicalEditor\GraphicalEditor.csproj", "{F0CFF498-DDCD-47E9-B0BC-956776572A2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphicalLab", "GraphicalLab\GraphicalLab.csproj", "{F0CFF498-DDCD-47E9-B0BC-956776572A2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
