@@ -31,7 +31,7 @@
             <Image Height="150" Width="150" Source="../Assets/logo.png"></Image>
         </suki:SukiSideMenu.HeaderContent>
         <suki:SukiSideMenu.Items>
-            <suki:SukiSideMenuItem Header="Отрезки" Classes="Compact">
+            <suki:SukiSideMenuItem Header="Отрезки">
                 <suki:SukiSideMenuItem.Icon>
                     <avalonia:MaterialIcon Width="20"
                                            Height="20"
@@ -126,7 +126,7 @@
 
             <!-- Other Pages -->
 
-            <suki:SukiSideMenuItem Header="Эллипсы" Classes="Compact">
+            <suki:SukiSideMenuItem Header="Эллипсы">
                 <suki:SukiSideMenuItem.Icon>
                     <avalonia:MaterialIcon Width="20"
                                            Height="20"
