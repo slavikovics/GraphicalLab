@@ -2,7 +2,7 @@
 using Avalonia.Controls.Notifications;
 using SukiUI.Toasts;
 
-namespace GraphicalLab;
+namespace GraphicalLab.Services.ToastManagerService;
 
 public class ToastManager : IToastManager
 {

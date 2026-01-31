@@ -6,6 +6,8 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Lines;
+using GraphicalLab.Services.ToastManagerService;
+using GraphicalLab.Services.WritableBitmapProviderService;
 
 namespace GraphicalLab.ViewModels;
 

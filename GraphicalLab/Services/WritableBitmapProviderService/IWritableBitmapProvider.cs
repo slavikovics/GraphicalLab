@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 
-namespace GraphicalLab;
+namespace GraphicalLab.Services.WritableBitmapProviderService;
 
 public interface IWritableBitmapProvider
 {

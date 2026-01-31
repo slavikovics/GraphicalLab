@@ -46,7 +46,6 @@ public class Pixel
                | ((uint)newG << 8)
                | newB;
     }
-
     
     public Pixel Swapped()
     {

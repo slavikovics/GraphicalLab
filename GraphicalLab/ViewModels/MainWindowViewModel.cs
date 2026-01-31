@@ -1,11 +1,4 @@
-﻿using System.Collections.Generic;
-using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
-using Avalonia.Input;
-using Avalonia.Media.Imaging;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using GraphicalLab.Lines;
+﻿using GraphicalLab.Services.ToastManagerService;
 using SukiUI.Toasts;
 
 namespace GraphicalLab.ViewModels;

@@ -3,6 +3,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using GraphicalLab.Services.ToastManagerService;
+using GraphicalLab.Services.WritableBitmapProviderService;
 using Microsoft.Extensions.DependencyInjection;
 using GraphicalLab.ViewModels;
 using GraphicalLab.Views;
