@@ -8,29 +8,35 @@ public static class DdaLineGenerator
     public static List<Pixel> DrawLine(Pixel start, Pixel end, uint color)
     {
         List<Pixel> newPoints = [];
-        double dx = end.X - start.X;
-        double dy = end.Y - start.Y;
-
-        int steps = (int)Math.Max(Math.Abs(dx), Math.Abs(dy));
-        if (steps == 0)
+    
+        if (start.X == end.X && start.Y == end.Y)
         {
             newPoints.Add(start);
             return newPoints;
         }
-
-        double xIncrement = dx / steps;
-        double yIncrement = dy / steps;
-
-        double x = start.X;
-        double y = start.Y;
-
-        for (int i = 0; i <= steps; i++)
+    
+        int x1 = start.X, y1 = start.Y;
+        int x2 = end.X, y2 = end.Y;
+        
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int length = Math.Max(Math.Abs(dx), Math.Abs(dy));
+        
+        double xIncrement = (double)dx / length;
+        double yIncrement = (double)dy / length;
+        
+        double x = x1;
+        double y = y1;
+        
+        newPoints.Add(new Pixel((int)Math.Round(x), (int)Math.Round(y), color));
+    
+        for (int i = 0; i < length; i++)
         {
-            newPoints.Add(new Pixel(x, y, color));
             x += xIncrement;
             y += yIncrement;
+            newPoints.Add(new Pixel((int)Math.Round(x), (int)Math.Round(y), color));
         }
-
+    
         return newPoints;
     }
 }

@@ -13,7 +13,7 @@ namespace GraphicalLab;
 
 public partial class App : Application
 {
-    public static ServiceProvider? ServiceProvider { get; private set; }
+    private static ServiceProvider? ServiceProvider { get; set; }
 
     private void RegisterUserServices()
     {
