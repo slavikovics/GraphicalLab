@@ -5,6 +5,7 @@ using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Microsoft.Extensions.DependencyInjection;
 using GraphicalLab.ViewModels;
 using GraphicalLab.Views;
 
@@ -12,6 +13,16 @@ namespace GraphicalLab;
 
 public partial class App : Application
 {
+    public static ServiceProvider? ServiceProvider { get; private set; }
+
+    private void RegisterUserServices()
+    {
+        ServiceCollection serviceCollection = new();
+        serviceCollection.AddSingleton<IToastManager, ToastManager>();
+        serviceCollection.AddSingleton<IWritableBitmapProvider, WritableBitmapProvider>();
+        ServiceProvider = serviceCollection.BuildServiceProvider();
+    }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -21,13 +32,17 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-            // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
             DisableAvaloniaDataAnnotationValidation();
-            desktop.MainWindow = new MainWindow
+            RegisterUserServices();
+            var toastManager = ServiceProvider?.GetRequiredService<IToastManager>();
+            var writableBitmapProvider = ServiceProvider?.GetRequiredService<IWritableBitmapProvider>();
+            if (toastManager != null)
             {
-                DataContext = new MainWindowViewModel(),
-            };
+                desktop.MainWindow = new MainWindow
+                {
+                    DataContext = new MainWindowViewModel(toastManager, writableBitmapProvider)
+                };
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

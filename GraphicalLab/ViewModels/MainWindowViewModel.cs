@@ -10,35 +10,41 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GraphicalLab.Lines;
 using SukiUI.Toasts;
 
 namespace GraphicalLab.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    private readonly IToastManager _toastManager;
+    private readonly IWritableBitmapProvider _writableBitmapProvider;
+    public ISukiToastManager ToastManager => _toastManager.GetToastManager();
+    
+    [ObservableProperty] private List<string> _lineTypes = ["ЦДА", "Брезенхем", "Ву"];
+    private delegate List<Pixel> DrawLineDelegate(Pixel start, Pixel end, uint color);
+    private Dictionary<int, DrawLineDelegate> _lineTypesMatch = null!;
+    
+    public Image? TargetImage = null;
+    
     [ObservableProperty] private int _bitmapWidth = 300;
     [ObservableProperty] private int _bitmapHeight = 300;
-    private const int DebugStep = 1;
-    public Image? TargetImage = null;
-
-    public ISukiToastManager ToastManager { get; } = new SukiToastManager();
-    [ObservableProperty] private List<string> _lineTypes = ["ЦДА", "Брезенхем", "Ву"];
+    
     [ObservableProperty] private bool _isGridVisible = true;
     [ObservableProperty] private int _selectedLineIndex;
     [ObservableProperty] private WriteableBitmap _bitmap;
-    
+
     private readonly List<Pixel> _pointsToDraw = [];
-    private delegate List<Pixel> DrawLineDelegate(Pixel start, Pixel end, uint color);
-    private Dictionary<int, DrawLineDelegate> _lineTypesMatch = null!;
 
     public string StepsCountText
     {
-        get => field;
+        get;
         set => SetProperty(ref field, value);
     }
 
     public bool IsDebugEnabled
     {
+        get;
         set
         {
             SetProperty(ref field, value);
@@ -46,15 +52,16 @@ public partial class MainWindowViewModel : ViewModelBase
             IsNextStepAvailable = value && _pointsToDraw.Count != 0;
             StepsCountText = $"({_pointsToDraw.Count.ToString()})";
         }
-        get;
     }
 
     [ObservableProperty] private bool _isNextStepAvailable;
 
     private Pixel? _firstPoint;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(IToastManager toastManager, IWritableBitmapProvider writableBitmapProvider)
     {
+        _toastManager = toastManager;
+        _writableBitmapProvider = writableBitmapProvider;
         InitializeLines();
         _bitmap = new(
             new PixelSize(_bitmapWidth, _bitmapHeight),
@@ -70,7 +77,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var ddaDelegate = new DrawLineDelegate(DrawLineDda);
         var brezenhemDelegate = new DrawLineDelegate(DrawLineBrezenhem);
         var wuDelegate = new DrawLineDelegate(DrawLineWu);
-        
+
         _lineTypesMatch.Add(0, DrawLineDda);
         _lineTypesMatch.Add(1, DrawLineBrezenhem);
         _lineTypesMatch.Add(2, DrawLineWu);
@@ -85,7 +92,7 @@ public partial class MainWindowViewModel : ViewModelBase
         int x = (int)(point.X / scale);
         int y = (int)(point.Y / scale);
 
-        ShowToast("Mouse Clicked", $"X: {x}, Y: {y}", NotificationType.Information);
+        _toastManager.ShowToast("Mouse Clicked", $"X: {x}, Y: {y}", NotificationType.Information);
 
         if (_firstPoint is null)
         {
@@ -145,91 +152,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private List<Pixel> DrawLineDda(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
-        List<Pixel> newPoints = [];
-        double dx = end.X - start.X;
-        double dy = end.Y - start.Y;
-
-        int steps = (int)Math.Max(Math.Abs(dx), Math.Abs(dy));
-        if (steps == 0)
-        {
-            newPoints.Add(start);
-            return newPoints;
-        }
-
-        double xIncrement = dx / steps;
-        double yIncrement = dy / steps;
-
-        double x = start.X;
-        double y = start.Y;
-
-        for (int i = 0; i <= steps; i++)
-        {
-            newPoints.Add(new Pixel(x, y, color));
-            x += xIncrement;
-            y += yIncrement;
-        }
-
-        return newPoints;
+        return DdaLineGenerator.DrawLine(start, end, color);
     }
 
     public List<Pixel> DrawLineBrezenhem(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
-        List<Pixel> newPoints = [];
-        int x1 = (int)start.X, y1 = (int)start.Y;
-        int x2 = (int)end.X, y2 = (int)end.Y;
-
-        int x = x1, y = y1;
-        int dx = Math.Abs(x2 - x1);
-        int dy = Math.Abs(y2 - y1);
-
-        if (dx < dy)
-        {
-            var reversed = DrawLineBrezenhem(start.Swapped(), end.Swapped(), color);
-            foreach (var point in reversed)
-            {
-                point.Swap();
-                newPoints.Add(point);
-            }
-
-            return newPoints;
-        }
-
-        double e = (double)dy / dx - 0.5;
-        newPoints.Add(new Pixel(start.X, start.Y, color));
-
-        int sx = (x1 < x2) ? 1 : -1;
-        int sy = (y1 < y2) ? 1 : -1;
-
-        for (int i = 1; i <= dx; i++)
-        {
-            if (e >= 0)
-            {
-                y += sy;
-                e -= 1;
-            }
-
-            x += sx;
-            e += (double)dy / dx;
-            newPoints.Add(new Pixel(x, y, color));
-        }
-
-        return newPoints;
+        return BrezenhemLineGenerator.DrawLine(start, end, color);
     }
 
     public List<Pixel> DrawLineWu(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
         return XiaolinWuLineGenerator.DrawLine(start, end, color);
-    }
-
-    private void ShowToast(string title, string content, NotificationType notificationType)
-    {
-        var builder = ToastManager.CreateToast();
-        builder.SetContent(content);
-        builder.SetTitle(title);
-        builder.SetType(notificationType);
-        builder.SetCanDismissByClicking(true);
-        builder.SetDismissAfter(TimeSpan.FromSeconds(2));
-        builder.Queue();
     }
 
     public unsafe void ClearBitmap(Image image)
