@@ -3,6 +3,8 @@
              x:Class="GraphicalLab.App"
              xmlns:local="using:GraphicalLab"
              RequestedThemeVariant="Default"
+             xmlns:views="using:GraphicalLab.Views"
+             xmlns:vm="using:GraphicalLab.ViewModels"
              xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -13,7 +15,12 @@
     </Application.Resources>
     
     <Application.DataTemplates>
-        <local:ViewLocator />
+        <DataTemplate DataType="vm:MainWindowViewModel">
+            <views:MainWindow/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:LinesPageViewModel">
+            <views:LinesPage/>
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>

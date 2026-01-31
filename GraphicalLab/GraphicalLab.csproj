@@ -29,4 +29,11 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
         <PackageReference Include="SukiUI" Version="6.0.3" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\LinesPage.axaml.cs">
+        <DependentUpon>LinesPage.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

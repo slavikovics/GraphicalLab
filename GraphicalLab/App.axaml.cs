@@ -1,10 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
 using GraphicalLab.ViewModels;
 using GraphicalLab.Views;
@@ -20,6 +18,8 @@ public partial class App : Application
         ServiceCollection serviceCollection = new();
         serviceCollection.AddSingleton<IToastManager, ToastManager>();
         serviceCollection.AddSingleton<IWritableBitmapProvider, WritableBitmapProvider>();
+        serviceCollection.AddSingleton<MainWindowViewModel>();
+        serviceCollection.AddSingleton<LinesPageViewModel>();
         ServiceProvider = serviceCollection.BuildServiceProvider();
     }
 
@@ -34,13 +34,12 @@ public partial class App : Application
         {
             DisableAvaloniaDataAnnotationValidation();
             RegisterUserServices();
-            var toastManager = ServiceProvider?.GetRequiredService<IToastManager>();
-            var writableBitmapProvider = ServiceProvider?.GetRequiredService<IWritableBitmapProvider>();
-            if (toastManager != null)
+            var mainWindowViewModel = ServiceProvider?.GetService<MainWindowViewModel>();
+            if (mainWindowViewModel != null)
             {
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(toastManager, writableBitmapProvider)
+                    DataContext = mainWindowViewModel
                 };
             }
         }
