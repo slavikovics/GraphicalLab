@@ -34,5 +34,9 @@
         <DependentUpon>LinesPage.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Views\CirclesPage.axaml.cs">
+        <DependentUpon>CirclesPage.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

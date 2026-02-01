@@ -6,9 +6,9 @@
              xmlns:vm="using:GraphicalLab.ViewModels"
              xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:graphicalLab="clr-namespace:GraphicalLab"
-             x:DataType="vm:LinesPageViewModel"
+             x:DataType="vm:CirclesPageViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="GraphicalLab.Views.LinesPage">
+             x:Class="GraphicalLab.Views.CirclesPage">
     <ScrollViewer>
         <StackPanel Spacing="10">
             <Grid>

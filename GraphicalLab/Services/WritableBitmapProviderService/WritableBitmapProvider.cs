@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
@@ -34,7 +33,7 @@ public class WritableBitmapProvider : IWritableBitmapProvider
         buffer[pixel.Y * stride + pixel.X] = pixel.Color;
     }
     
-    public unsafe void ClearBitmap(Image image)
+    public unsafe void ClearBitmap()
     {
         using var fb = _bitmap.Lock();
         uint* buffer = (uint*)fb.Address;
@@ -47,8 +46,6 @@ public class WritableBitmapProvider : IWritableBitmapProvider
                 buffer[y * stride + x] = 0;
             }
         }
-
-        image.InvalidateVisual();
     }
     
     public int GetBitmapWidth()

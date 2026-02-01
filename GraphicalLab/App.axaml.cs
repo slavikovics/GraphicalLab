@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
 using GraphicalLab.Services.WritableBitmapProviderService;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +21,10 @@ public partial class App : Application
         ServiceCollection serviceCollection = new();
         serviceCollection.AddSingleton<IToastManager, ToastManager>();
         serviceCollection.AddSingleton<IWritableBitmapProvider, WritableBitmapProvider>();
+        serviceCollection.AddSingleton<IDebuggableBitmapControl, DebuggableBitmapControl>();
         serviceCollection.AddSingleton<MainWindowViewModel>();
         serviceCollection.AddSingleton<LinesPageViewModel>();
+        serviceCollection.AddSingleton<CirclesPageViewModel>();
         ServiceProvider = serviceCollection.BuildServiceProvider();
     }
 

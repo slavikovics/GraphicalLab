@@ -9,10 +9,11 @@ using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Lines;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
+using GraphicalLab.Services.WritableBitmapProviderService;
 
 namespace GraphicalLab.ViewModels;
 
-public partial class LinesPageViewModel : ViewModelBase
+public partial class CirclesPageViewModel : ViewModelBase
 {
     private readonly IToastManager _toastManager;
     private readonly IDebuggableBitmapControl _debuggableBitmapControl;
@@ -54,7 +55,7 @@ public partial class LinesPageViewModel : ViewModelBase
 
     private Dictionary<int, DrawLineDelegate> _lineTypesMatch = null!;
 
-    public LinesPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
+    public CirclesPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
     {
         _toastManager = toastManager;
         _debuggableBitmapControl = debuggableBitmapControl;

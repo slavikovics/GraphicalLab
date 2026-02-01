@@ -21,6 +21,9 @@
         <DataTemplate DataType="vm:LinesPageViewModel">
             <views:LinesPage/>
         </DataTemplate>
+        <DataTemplate DataType="vm:CirclesPageViewModel">
+            <views:CirclesPage/>
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>

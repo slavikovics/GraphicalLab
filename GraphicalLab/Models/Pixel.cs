@@ -56,4 +56,9 @@ public class Pixel
     {
         (X, Y) = (Y, X);
     }
+
+    public override string ToString()
+    {
+        return $"({X},{Y})";
+    }
 }

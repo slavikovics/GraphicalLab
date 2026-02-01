@@ -5,9 +5,9 @@ using GraphicalLab.ViewModels;
 
 namespace GraphicalLab.Views;
 
-public partial class LinesPage : UserControl
+public partial class CirclesPage : UserControl
 {
-    public LinesPage()
+    public CirclesPage()
     {
         InitializeComponent();
         Loaded += SetUp;
@@ -15,11 +15,11 @@ public partial class LinesPage : UserControl
 
     private void SetUp(object? sender, RoutedEventArgs e)
     {
-        (DataContext as LinesPageViewModel)?.TargetImage = Image;
+        (DataContext as CirclesPageViewModel)?.TargetImage = Image;
     }
 
     private void Image_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        (DataContext as LinesPageViewModel)?.HandleClickCommand.Execute(e);
+        (DataContext as CirclesPageViewModel)?.HandleClickCommand.Execute(e);
     }
 }
