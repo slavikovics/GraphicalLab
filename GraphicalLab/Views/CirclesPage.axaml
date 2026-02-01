@@ -29,23 +29,45 @@
                             <avalonia:MaterialIcon Width="20"
                                                    HorizontalAlignment="Right"
                                                    Height="20"
-                                                   Margin="5"
+                                                   Margin="3"
                                                    Kind="CircleEditOutline" />
                             <ComboBox SelectedIndex="{Binding SelectedCircleIndex}"
-                                      ItemsSource="{Binding CircleTypes}" />
+                                      ItemsSource="{Binding CircleTypes}"/>
                             <TextBlock VerticalAlignment="Center"
-                                       Margin="5"/>
+                                       Margin="3" />
                             <TextBlock VerticalAlignment="Center"
-                                       Margin="5">
+                                       IsVisible="{Binding IsRadiusVisible}"
+                                       Margin="3">
                                 R:
                             </TextBlock>
                             <NumericUpDown Minimum="1"
-                                           Width="90"
                                            Maximum="100"
+                                           IsVisible="{Binding IsRadiusVisible}"
                                            FormatString="0"
-                                           Value="{Binding Radius}"/>
+                                           Value="{Binding Radius}" />
+                            <TextBlock VerticalAlignment="Center"
+                                       IsVisible="{Binding IsAVisible}"
+                                       Margin="5">
+                                A:
+                            </TextBlock>
+                            <NumericUpDown Minimum="1"
+                                           Maximum="100"
+                                           Width="80"
+                                           IsVisible="{Binding IsAVisible}"
+                                           FormatString="0"
+                                           Value="{Binding A}" />
+                            <TextBlock VerticalAlignment="Center"
+                                       IsVisible="{Binding IsBVisible}"
+                                       Margin="5">
+                                B:
+                            </TextBlock>
+                            <NumericUpDown Minimum="1"
+                                           Maximum="100"
+                                           Width="80"
+                                           IsVisible="{Binding IsBVisible}"
+                                           FormatString="0"
+                                           Value="{Binding B}" />
                         </StackPanel>
-
                     </suki:GlassCard>
                 </Border>
                 <Border Grid.Column="1"

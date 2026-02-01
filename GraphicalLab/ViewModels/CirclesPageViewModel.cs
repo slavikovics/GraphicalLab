@@ -26,8 +26,14 @@ public partial class CirclesPageViewModel : ViewModelBase
     [ObservableProperty] private bool _isNextStepAvailable;
     [ObservableProperty] private string _stepsCountText;
     [ObservableProperty] private int _selectedCircleIndex;
+
+    [ObservableProperty] private bool _isRadiusVisible;
     [ObservableProperty] private int _radius;
+
+    [ObservableProperty] private bool _isAVisible;
     [ObservableProperty] private int _a;
+    
+    [ObservableProperty] private bool _isBVisible;
     [ObservableProperty] private int _b;
 
     public bool IsGridVisible
@@ -62,8 +68,19 @@ public partial class CirclesPageViewModel : ViewModelBase
         _debuggableBitmapControl = debuggableBitmapControl;
         _debuggableBitmapControl.WritableBitmapChanged += UpdateImage;
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
+        PropertyChanged += OnPropertyChanged;
         InitializeLines();
         InitializeProperties();
+    }
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SelectedCircleIndex))
+        {
+            IsRadiusVisible = CircleTypes[SelectedCircleIndex] == "Окружность";
+            IsAVisible = CircleTypes[SelectedCircleIndex] != "Окружность";
+            IsBVisible = CircleTypes[SelectedCircleIndex] != "Окружность";
+        }
     }
 
     private void DebuggableBitmapControlOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -90,6 +107,9 @@ public partial class CirclesPageViewModel : ViewModelBase
     {
         IsGridVisible = _debuggableBitmapControl.IsGridVisible;
         SelectedCircleIndex = 0;
+        IsRadiusVisible = true;
+        IsAVisible = false;
+        IsBVisible = false;
         Radius = 10;
         IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
