@@ -30,13 +30,20 @@
                                                    HorizontalAlignment="Right"
                                                    Height="20"
                                                    Margin="5"
-                                                   Kind="FormatLineStyle" />
+                                                   Kind="CircleEditOutline" />
+                            <ComboBox SelectedIndex="{Binding SelectedCircleIndex}"
+                                      ItemsSource="{Binding CircleTypes}" />
+                            <TextBlock VerticalAlignment="Center"
+                                       Margin="5"/>
                             <TextBlock VerticalAlignment="Center"
                                        Margin="5">
-                                Алгоритм построения отрезков:
+                                R:
                             </TextBlock>
-                            <ComboBox SelectedIndex="{Binding SelectedLineIndex}"
-                                      ItemsSource="{Binding LineTypes}" />
+                            <NumericUpDown Minimum="1"
+                                           Width="90"
+                                           Maximum="100"
+                                           FormatString="0"
+                                           Value="{Binding Radius}"/>
                         </StackPanel>
 
                     </suki:GlassCard>

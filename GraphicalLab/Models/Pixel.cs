@@ -4,10 +4,10 @@ namespace GraphicalLab;
 
 public class Pixel
 {
-    public int X { get; private set; }
-    public int Y { get; private set; }
-    public double Intensity { get; private set; }
-    public uint Color { get; private set; }
+    public int X { get; set; }
+    public int Y { get; set; }
+    public double Intensity { get; set; }
+    public uint Color { get; set; }
 
     public Pixel(int x, int y, uint color = 0xFF0000FF, double intensity = 1)
     {

@@ -6,10 +6,9 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GraphicalLab.Lines;
+using GraphicalLab.Circles;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
-using GraphicalLab.Services.WritableBitmapProviderService;
 
 namespace GraphicalLab.ViewModels;
 
@@ -21,14 +20,16 @@ public partial class CirclesPageViewModel : ViewModelBase
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
     public WriteableBitmap Bitmap => _debuggableBitmapControl.GetBitmap();
-    
+
     public Image? TargetImage = null;
-    private Pixel? _firstPoint;
 
     [ObservableProperty] private bool _isNextStepAvailable;
     [ObservableProperty] private string _stepsCountText;
-    [ObservableProperty] private int _selectedLineIndex;
-    
+    [ObservableProperty] private int _selectedCircleIndex;
+    [ObservableProperty] private int _radius;
+    [ObservableProperty] private int _a;
+    [ObservableProperty] private int _b;
+
     public bool IsGridVisible
     {
         get;
@@ -36,7 +37,7 @@ public partial class CirclesPageViewModel : ViewModelBase
         {
             SetProperty(ref field, value);
             _debuggableBitmapControl.IsGridVisible = value;
-        } 
+        }
     }
 
     public bool IsDebugEnabled
@@ -46,14 +47,14 @@ public partial class CirclesPageViewModel : ViewModelBase
         {
             SetProperty(ref field, value);
             _debuggableBitmapControl.IsDebugEnabled = value;
-        } 
+        }
     }
 
-    [ObservableProperty] private List<string> _lineTypes = ["ЦДА", "Брезенхем", "Ву"];
+    [ObservableProperty] private List<string> _circleTypes = ["Окружность", "Эллипс", "Гипербола", "Парабола"];
 
-    private delegate void DrawLineDelegate(Pixel start, Pixel end, uint color);
+    private delegate void DrawCircleDelegate(Pixel center, uint color);
 
-    private Dictionary<int, DrawLineDelegate> _lineTypesMatch = null!;
+    private Dictionary<int, DrawCircleDelegate> _circleTypesMatch = null!;
 
     public CirclesPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
     {
@@ -84,26 +85,28 @@ public partial class CirclesPageViewModel : ViewModelBase
             IsGridVisible = _debuggableBitmapControl.IsGridVisible;
         }
     }
-    
+
     private void InitializeProperties()
     {
         IsGridVisible = _debuggableBitmapControl.IsGridVisible;
-        SelectedLineIndex = 0;
-        IsNextStepAvailable =_debuggableBitmapControl.IsNextStepAvailable;
+        SelectedCircleIndex = 0;
+        Radius = 10;
+        IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
         StepsCountText = _debuggableBitmapControl.StepsCountText;
     }
 
     private void InitializeLines()
     {
-        _lineTypesMatch = new Dictionary<int, DrawLineDelegate>();
-        var ddaDelegate = new DrawLineDelegate(DrawLineDda);
-        var brezenhemDelegate = new DrawLineDelegate(DrawLineBrezenhem);
-        var wuDelegate = new DrawLineDelegate(DrawLineWu);
+        _circleTypesMatch = new Dictionary<int, DrawCircleDelegate>();
+        var ddaDelegate = new DrawCircleDelegate(DrawCircle);
+        var brezenhemDelegate = new DrawCircleDelegate(DrawEllipse);
+        var wuDelegate = new DrawCircleDelegate(DrawHyperbola);
 
-        _lineTypesMatch.Add(0, DrawLineDda);
-        _lineTypesMatch.Add(1, DrawLineBrezenhem);
-        _lineTypesMatch.Add(2, DrawLineWu);
+        _circleTypesMatch.Add(0, DrawCircle);
+        _circleTypesMatch.Add(1, DrawEllipse);
+        _circleTypesMatch.Add(2, DrawHyperbola);
+        _circleTypesMatch.Add(3, DrawParabola);
     }
 
     [RelayCommand]
@@ -116,17 +119,8 @@ public partial class CirclesPageViewModel : ViewModelBase
         int x = (int)(point.X / scale);
         int y = (int)(point.Y / scale);
 
-        _debuggableBitmapControl.SetPixel(new Pixel(x, y));
-
-        if (_firstPoint is null)
-        {
-            _firstPoint = new Pixel(x, y);
-        }
-        else
-        {
-            _lineTypesMatch[SelectedLineIndex].Invoke(_firstPoint, new Pixel(x, y), 0xFF0000FF);
-            _firstPoint = null;
-        }
+        var center = new Pixel(x, y);
+        _circleTypesMatch[SelectedCircleIndex].Invoke(center, 0xFF0000FF);
     }
 
     private void UpdateImage()
@@ -134,28 +128,40 @@ public partial class CirclesPageViewModel : ViewModelBase
         TargetImage?.InvalidateVisual();
     }
 
-    private void DrawLineDda(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    private void DrawCircle(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = DdaLineGenerator.DrawLine(start, end, color);
+        var points = CircleGenerator.DrawCircle(center, Radius, color);
         _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled) _toastManager.ShowToast("Нарисован отрезок", $"Алгоритм: ЦДА, Начало: {start}, Конец: {end}",
-            NotificationType.Success);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Нарисована окружность", $"Центр: {center}, Радиус: {Radius}",
+                NotificationType.Success);
     }
 
-    private void DrawLineBrezenhem(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    private void DrawEllipse(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = BrezenhemLineGenerator.DrawLine(start, end, color);
+        var points = CircleGenerator.DrawCircle(center, Radius, color);
         _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled) _toastManager.ShowToast("Нарисован отрезок", $"Алгоритм: Брезенхем, Начало: {start}, Конец: {end}",
-            NotificationType.Success);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Нарисована окружность", $"Центр: {center}, Радиус: {Radius}",
+                NotificationType.Success);
     }
 
-    private void DrawLineWu(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    private void DrawHyperbola(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = XiaolinWuLineGenerator.DrawLine(start, end, color);
+        var points = CircleGenerator.DrawCircle(center, Radius, color);
         _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled) _toastManager.ShowToast("Нарисован отрезок", $"Алгоритм: Ву, Начало: {start}, Конец: {end}",
-            NotificationType.Success);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Нарисована окружность", $"Центр: {center}, Радиус: {Radius}",
+                NotificationType.Success);
+    }
+
+    private void DrawParabola(Pixel center, uint color = 0xFF0000FF)
+    {
+        var points = CircleGenerator.DrawCircle(center, Radius, color);
+        _debuggableBitmapControl.AddPoints(points);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Нарисована окружность", $"Центр: {center}, Радиус: {Radius}",
+                NotificationType.Success);
     }
 
     [RelayCommand]
