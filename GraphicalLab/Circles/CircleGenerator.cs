@@ -4,7 +4,7 @@ namespace GraphicalLab.Circles;
 
 public static class CircleGenerator
 {
-    private static void MoveCoordinates(Pixel center, List<Pixel> pixels)
+    public static void MoveCoordinates(Pixel center, List<Pixel> pixels)
     {
         foreach (var pixel in pixels)
         {
@@ -13,7 +13,7 @@ public static class CircleGenerator
         }
     }
 
-    private static List<Pixel> FlipHorizontally(Pixel center, List<Pixel> pixels)
+    public static List<Pixel> FlipHorizontally(Pixel center, List<Pixel> pixels)
     {
         List<Pixel> flipped = [];
         foreach (var pixel in pixels)
@@ -25,7 +25,7 @@ public static class CircleGenerator
         return flipped;
     }
     
-    private static List<Pixel> FlipVertically(Pixel center, List<Pixel> pixels)
+    public static List<Pixel> FlipVertically(Pixel center, List<Pixel> pixels)
     {
         List<Pixel> flipped = [];
         foreach (var pixel in pixels)
@@ -49,8 +49,8 @@ public static class CircleGenerator
         {
             if (delta > 0)
             {
-                var betaStar = 2 * delta - 2 * x - 1;
-                if (betaStar > 0)
+                var dStar = 2 * delta - 2 * x - 1;
+                if (dStar > 0)
                 {
                     y -= 1;
                     delta -= 2 * y + 1;
@@ -65,8 +65,8 @@ public static class CircleGenerator
 
             else if (delta < 0)
             {
-                var beta = 2 * delta + 2 * y - 1;
-                if (beta <= 0)
+                var d = 2 * delta + 2 * y - 1;
+                if (d <= 0)
                 {
                     x += 1;
                     delta += 2 * x + 1;

@@ -159,16 +159,16 @@ public partial class CirclesPageViewModel : ViewModelBase
 
     private void DrawEllipse(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = CircleGenerator.DrawCircle(center, Radius, color);
+        var points = EllipseGenerator.DrawEllipse(center, A, B, color);
         _debuggableBitmapControl.AddPoints(points);
         if (!IsDebugEnabled)
-            _toastManager.ShowToast("Нарисована окружность", $"Центр: {center}, Радиус: {Radius}",
+            _toastManager.ShowToast("Нарисован эллипс", $"Центр: {center}, A: {A}, B: {B}",
                 NotificationType.Success);
     }
 
     private void DrawHyperbola(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = CircleGenerator.DrawCircle(center, Radius, color);
+        var points = EllipseGenerator.DrawEllipse(center, A, B, color);
         _debuggableBitmapControl.AddPoints(points);
         if (!IsDebugEnabled)
             _toastManager.ShowToast("Нарисована окружность", $"Центр: {center}, Радиус: {Radius}",
@@ -177,7 +177,7 @@ public partial class CirclesPageViewModel : ViewModelBase
 
     private void DrawParabola(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = CircleGenerator.DrawCircle(center, Radius, color);
+        var points = EllipseGenerator.DrawEllipse(center, A, B, color);
         _debuggableBitmapControl.AddPoints(points);
         if (!IsDebugEnabled)
             _toastManager.ShowToast("Нарисована окружность", $"Центр: {center}, Радиус: {Radius}",
