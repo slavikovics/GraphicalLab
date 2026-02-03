@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
+using Avalonia.Input;
 
 namespace GraphicalLab.Circles;
 
@@ -21,10 +23,10 @@ public static class CircleGenerator
             var dy = pixel.Y - center.Y;
             flipped.Add(new Pixel(pixel.X, center.Y - dy));
         }
-        
+
         return flipped;
     }
-    
+
     public static List<Pixel> FlipVertically(Pixel center, List<Pixel> pixels)
     {
         List<Pixel> flipped = [];
@@ -33,8 +35,33 @@ public static class CircleGenerator
             var dx = pixel.X - center.X;
             flipped.Add(new Pixel(center.X - dx, pixel.Y));
         }
-        
+
         return flipped;
+    }
+
+    private static int CalculateDStar(int delta, int x)
+    {
+        return 2 * delta - 2 * x - 1;
+    }
+
+    private static int CalculateD(int delta, int y)
+    {
+        return 2 * delta + 2 * y - 1;
+    }
+
+    private static int MoveD(int x, int y)
+    {
+        return 2 * x - 2 * y + 2;
+    }
+
+    private static int MoveV(int y)
+    {
+        return 2 * y + 1;
+    }
+
+    private static int MoveH(int x)
+    {
+        return 2 * x + 1;
     }
 
     public static List<Pixel> DrawCircle(Pixel center, int radius, uint color = 0xFF0000FF)
@@ -49,33 +76,33 @@ public static class CircleGenerator
         {
             if (delta > 0)
             {
-                var dStar = 2 * delta - 2 * x - 1;
+                var dStar = CalculateDStar(delta, x);
                 if (dStar > 0)
                 {
                     y -= 1;
-                    delta -= 2 * y + 1;
+                    delta -= MoveV(y);
                 }
                 else
                 {
                     x += 1;
                     y -= 1;
-                    delta += 2 * x - 2 * y + 2;
+                    delta += MoveD(x, y);
                 }
             }
 
             else if (delta < 0)
             {
-                var d = 2 * delta + 2 * y - 1;
+                var d = CalculateD(delta, y);
                 if (d <= 0)
                 {
                     x += 1;
-                    delta += 2 * x + 1;
+                    delta += MoveH(x);
                 }
                 else
                 {
                     x += 1;
                     y -= 1;
-                    delta += 2 * x - 2 * y + 2;
+                    delta += MoveD(x, y);
                 }
             }
 
@@ -83,7 +110,7 @@ public static class CircleGenerator
             {
                 x += 1;
                 y -= 1;
-                delta += 2 * x - 2 * y + 2;
+                delta += MoveD(x, y);
             }
 
             pixels.Add(new Pixel(x, y));

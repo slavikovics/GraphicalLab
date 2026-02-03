@@ -159,7 +159,7 @@ public partial class CirclesPageViewModel : ViewModelBase
 
     private void DrawEllipse(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = EllipseGenerator.DrawEllipse(center, A, B, color);
+        var points = EllipseGenerator2.DrawEllipse(center, A, B, color);
         _debuggableBitmapControl.AddPoints(points);
         if (!IsDebugEnabled)
             _toastManager.ShowToast("Нарисован эллипс", $"Центр: {center}, A: {A}, B: {B}",
