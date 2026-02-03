@@ -7,60 +7,73 @@ public static class EllipseGenerator
 {
     public static List<Pixel> DrawEllipse(Pixel center, int a, int b, uint color = 0xFF0000FF)
     {
-        List<Pixel> pixels = [];
-        if (a == 0 || b == 0) return pixels;
-        int x = 0, y = b;
-        
-        long a2 = a * a;
-        long b2 = b * b;
-        long twoA2 = 2 * a2;
-        long twoB2 = 2 * b2;
-        
-        long d1 = b2 - a2 * b + a2 / 4;
-        
-        while (twoB2 * x <= twoA2 * y)
+        var pointsSet = new HashSet<(int, int)>();
+
+        void AddSym(int cx, int cy)
         {
-            pixels.Add(new Pixel(x, y));
-        
+            pointsSet.Add((cx, cy));
+            pointsSet.Add((-cx, cy));
+            pointsSet.Add((cx, -cy));
+            pointsSet.Add((-cx, -cy));
+        }
+
+        int x = 0;
+        int y = b;
+        double a2 = (double)a * a;
+        double b2 = (double)b * b;
+
+        double d1 = b2 - a2 * b + 0.25 * a2;
+        double dx = 2.0 * b2 * x;
+        double dy = 2.0 * a2 * y;
+
+        while (dx < dy)
+        {
+            AddSym(x, y);
+
             if (d1 < 0)
             {
-                d1 += twoB2 * x + b2;
-            }
-            else
-            {
-                y--;
-                d1 += twoB2 * x - twoA2 * y + b2;
-            }
-            x++;
-        }
-        
-        long d2 = (long)(b2 * (x + 0.5) * (x + 0.5) + 
-            a2 * (y - 1) * (y - 1) - a2 * b2);
-    
-        while (y >= 0)
-        {
-            pixels.Add(new Pixel(x, y));
-        
-            if (d2 > 0)
-            {
-                d2 += a2 - twoA2 * y;
+                x++;
+                dx = dx + 2.0 * b2;
+                d1 = d1 + dx + b2;
             }
             else
             {
                 x++;
-                d2 += twoB2 * x + a2 - twoA2 * y;
+                y--;
+                dx = dx + 2.0 * b2;
+                dy = dy - 2.0 * a2;
+                d1 = d1 + dx - dy + b2;
             }
-            y--;
         }
-        
-        CircleGenerator.MoveCoordinates(center, pixels);
-        var q1 = CircleGenerator.FlipHorizontally(center, pixels);
-        var q2 = CircleGenerator.FlipVertically(center, pixels);
-        var q3 = CircleGenerator.FlipVertically(center, q1);
-        pixels.AddRange(q1);
-        pixels.AddRange(q2);
-        pixels.AddRange(q3);
-    
-        return pixels;
+
+        double d2 = b2 * (x + 0.5) * (x + 0.5) + a2 * (y - 1) * (y - 1) - a2 * b2;
+
+        while (y >= 0)
+        {
+            AddSym(x, y);
+
+            if (d2 > 0)
+            {
+                y--;
+                dy = dy - 2.0 * a2;
+                d2 = d2 + a2 - dy;
+            }
+            else
+            {
+                x++;
+                y--;
+                dx = dx + 2.0 * b2;
+                dy = dy - 2.0 * a2;
+                d2 = d2 + dx - dy + a2;
+            }
+        }
+
+        var result = new List<Pixel>(pointsSet.Count);
+        foreach (var (px, py) in pointsSet)
+        {
+            result.Add(new Pixel(px + center.X, py + center.Y));
+        }
+
+        return result;
     }
 }

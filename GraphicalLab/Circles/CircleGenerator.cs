@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Avalonia.Input;
 
@@ -124,5 +125,45 @@ public static class CircleGenerator
         pixels.AddRange(q2);
         pixels.AddRange(q3);
         return pixels;
+    }
+
+    public static List<Pixel> DrawCircle2(Pixel center, int radius, uint color = 0xFF0000FF)
+    {
+        var pixels = new HashSet<Pixel>();
+
+        int x = 0;
+        int y = radius;
+        int d = 1 - radius;
+
+        void AddSymmetric(int x, int y)
+        {
+            pixels.Add(new Pixel(center.X + x, center.Y + y));
+            pixels.Add(new Pixel(center.X - x, center.Y + y));
+            pixels.Add(new Pixel(center.X + x, center.Y - y));
+            pixels.Add(new Pixel(center.X - x, center.Y - y));
+            pixels.Add(new Pixel(center.X + y, center.Y + x));
+            pixels.Add(new Pixel(center.X - y, center.Y + x));
+            pixels.Add(new Pixel(center.X + y, center.Y - x));
+            pixels.Add(new Pixel(center.X - y, center.Y - x));
+        }
+
+        while (x <= y)
+        {
+            AddSymmetric(x, y);
+
+            if (d < 0)
+            {
+                d += 2 * x + 3;
+            }
+            else
+            {
+                d += 2 * (x - y) + 5;
+                y--;
+            }
+
+            x++;
+        }
+
+        return pixels.ToList();
     }
 }
