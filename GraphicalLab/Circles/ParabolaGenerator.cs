@@ -9,7 +9,7 @@ public static class ParabolaGenerator
         Pixel center,
         int a,
         int b,
-        int yMax,
+        int max,
         uint color = 0xFF0000FF)
     {
         var pixels = new List<Pixel>();
@@ -22,15 +22,15 @@ public static class ParabolaGenerator
 
         int prevX = x;
 
-        while (y <= yMax)
+        while (y <= max && x <= max)
         {
             int from = Math.Min(prevX, x);
             int to = Math.Max(prevX, x);
 
             for (int xx = from; xx <= to; xx++)
             {
-                pixels.Add(new Pixel(center.X + xx, center.Y + y));
-                pixels.Add(new Pixel(center.X + xx, center.Y - y));
+                pixels.Add(new Pixel(center.X + xx, center.Y + y, color));
+                pixels.Add(new Pixel(center.X + xx, center.Y - y, color));
             }
 
             prevX = x;

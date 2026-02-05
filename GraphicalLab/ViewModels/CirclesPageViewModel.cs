@@ -168,7 +168,7 @@ public partial class CirclesPageViewModel : ViewModelBase
 
     private void DrawHyperbola(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = HyperbolaGenerator.DrawHyperbola(center, A, B, BitmapWidth, color);
+        var points = HyperbolaGenerator.DrawHyperbola(center, A, B, BitmapWidth, BitmapHeight, color);
         _debuggableBitmapControl.AddPoints(points);
         if (!IsDebugEnabled)
             _toastManager.ShowToast("Нарисована гипербола", $"Центр: {center}, A: {A}, B: {B}",
