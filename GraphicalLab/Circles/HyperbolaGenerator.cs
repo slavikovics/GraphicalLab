@@ -14,34 +14,62 @@ public static class HyperbolaGenerator
         uint color = 0xFF0000FF)
     {
         var pixels = new HashSet<(int, int)>();
-
-        double a2 = (double)a * a;
-        double b2 = (double)b * b;
         
-        for (int x = a; x <= xMax; x++)
-        {
-            double t = (x * x) / a2 - 1.0;
-            if (t < 0) continue;
+        long a2 = (long)a * a;
+        long b2 = (long)b * b;
 
-            int y = (int)Math.Round(Math.Sqrt(b2 * t));
+        int x = a;
+        int y = 0;
+        
+        AddSymmetric(pixels, center, x, y);
+
+        long d1 = 4L * a * b2 + b2 - 4L * a2;
+
+        while (b2 * x >= a2 * (y + 1) && x <= xMax && y <= yMax)
+        {
+            if (d1 < 0)
+            {
+                d1 += 4 * (b2 * (2 * x + 2) - a2 * (2 * y + 3));
+                x++;
+                y++;
+            }
+            else
+            {
+                d1 -= 4 * a2 * (2 * y + 3);
+                y++;
+            }
+
             AddSymmetric(pixels, center, x, y);
         }
 
-        for (int y = 0; y <= yMax; y++)
-        {
-            double t = 1.0 + (y * y) / b2;
+        long d2 = 4 * b2 * ((long)(x + 1) * (x + 1))
+                 - (2L * y + 1) * (2L * y + 1) * a2
+                 - 4 * a2 * b2;
 
-            int x = (int)Math.Round(a * Math.Sqrt(t));
-            if (x < a || x > xMax) continue;
+        while (x <= xMax && y <= yMax)
+        {
+            if (d2 > 0)
+            {
+                d2 += 4 * (b2 * (2 * x + 3) - a2 * (2 * y + 2));
+                x++;
+                y++;
+            }
+            else
+            {
+                d2 += 4 * b2 * (2 * x + 3);
+                x++;
+            }
 
             AddSymmetric(pixels, center, x, y);
         }
-        
-        List<Pixel> result = new();
-        foreach (var (x, y) in pixels)
+
+        var result = new List<Pixel>();
+        foreach (var (px, py) in pixels)
         {
-            if (x >= 0 && x <= xMax && y >= 0 && y <= yMax)
-                result.Add(new Pixel(x, y, color));
+            if (Math.Abs(px - center.X) <= xMax && Math.Abs(py - center.Y) <= yMax)
+            {
+                result.Add(new Pixel(px, py, color));
+            }
         }
 
         return result;
