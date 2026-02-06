@@ -21,8 +21,9 @@ public static class ParabolaGenerator
         int ddx = 2 * a;
 
         int prevX = x;
+        int prevY = y;
 
-        while (y <= max && x <= max)
+        while (prevY <= max && prevX <= max)
         {
             int from = Math.Min(prevX, x);
             int to = Math.Max(prevX, x);
@@ -34,6 +35,7 @@ public static class ParabolaGenerator
             }
 
             prevX = x;
+            prevY = y;
 
             y++;
             x += dx;

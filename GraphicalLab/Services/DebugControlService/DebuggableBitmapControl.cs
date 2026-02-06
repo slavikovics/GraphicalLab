@@ -9,18 +9,18 @@ namespace GraphicalLab.Services.DebugControlService;
 public partial class DebuggableBitmapControl : ObservableObject, IDebuggableBitmapControl
 {
     private readonly IWritableBitmapProvider _writableBitmapProvider;
-    
+
     private List<Pixel> PointsToDraw { get; }
     public event Action WritableBitmapChanged;
     [ObservableProperty] private bool _isNextStepAvailable;
     [ObservableProperty] private bool _isGridVisible;
-    
+
     public string StepsCountText
     {
         get;
         set => SetProperty(ref field, value);
     }
-    
+
     public bool IsDebugEnabled
     {
         get;
@@ -43,7 +43,14 @@ public partial class DebuggableBitmapControl : ObservableObject, IDebuggableBitm
     public void AddPoints(List<Pixel> points)
     {
         if (points.Count == 0) return;
-        PointsToDraw.AddRange(points);
+        foreach (var point in points)
+        {
+            if (!(point.X >= GetBitmapWidth() || point.Y >= GetBitmapHeight()))
+            {
+                PointsToDraw.Add(point);
+            }
+        }
+
         if (IsDebugEnabled)
         {
             IsNextStepAvailable = true;
@@ -54,7 +61,7 @@ public partial class DebuggableBitmapControl : ObservableObject, IDebuggableBitm
             DrawAllPoints();
         }
     }
-    
+
     public void ClearBitmap()
     {
         PointsToDraw.Clear();
@@ -63,18 +70,18 @@ public partial class DebuggableBitmapControl : ObservableObject, IDebuggableBitm
         _writableBitmapProvider.ClearBitmap();
         WritableBitmapChanged?.Invoke();
     }
-    
+
     public void HandleDebugNextStep()
     {
         if (!IsDebugEnabled || PointsToDraw.Count == 0) return;
         _writableBitmapProvider.SetPixel(PointsToDraw[0]);
         WritableBitmapChanged?.Invoke();
-        
+
         PointsToDraw.RemoveAt(0);
         StepsCountText = $"({PointsToDraw.Count.ToString()})";
         if (PointsToDraw.Count == 0) IsNextStepAvailable = false;
     }
-    
+
     public WriteableBitmap GetBitmap()
     {
         return _writableBitmapProvider.GetBitmap();
@@ -95,7 +102,7 @@ public partial class DebuggableBitmapControl : ObservableObject, IDebuggableBitm
         _writableBitmapProvider.SetPixel(pixel);
         WritableBitmapChanged?.Invoke();
     }
-    
+
     private void DrawAllPoints()
     {
         foreach (var newPoint in PointsToDraw)
