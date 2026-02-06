@@ -111,6 +111,8 @@ public partial class CirclesPageViewModel : ViewModelBase
         IsAVisible = false;
         IsBVisible = false;
         Radius = 10;
+        A = 2;
+        B = 3;
         IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
         StepsCountText = _debuggableBitmapControl.StepsCountText;
