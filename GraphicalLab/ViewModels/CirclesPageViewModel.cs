@@ -57,9 +57,9 @@ public partial class CirclesPageViewModel : ViewModelBase
     }
 
     [ObservableProperty] private List<string> _circleTypes = ["Окружность", "Эллипс", "Гипербола", "Парабола"];
+    [ObservableProperty] private string _parameterName = "R:";
 
     private delegate void DrawCircleDelegate(Pixel center, uint color);
-
     private Dictionary<int, DrawCircleDelegate> _circleTypesMatch = null!;
 
     public CirclesPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
@@ -77,9 +77,11 @@ public partial class CirclesPageViewModel : ViewModelBase
     {
         if (e.PropertyName == nameof(SelectedCircleIndex))
         {
-            IsRadiusVisible = CircleTypes[SelectedCircleIndex] == "Окружность";
-            IsAVisible = CircleTypes[SelectedCircleIndex] != "Окружность";
-            IsBVisible = CircleTypes[SelectedCircleIndex] != "Окружность";
+            IsRadiusVisible = CircleTypes[SelectedCircleIndex] == "Окружность" || CircleTypes[SelectedCircleIndex] == "Парабола";
+            IsAVisible = CircleTypes[SelectedCircleIndex] != "Окружность" && CircleTypes[SelectedCircleIndex] != "Парабола";
+            IsBVisible = CircleTypes[SelectedCircleIndex] != "Окружность" && CircleTypes[SelectedCircleIndex] != "Парабола";
+            if (CircleTypes[SelectedCircleIndex] == "Окружность") ParameterName = "R:";
+            else ParameterName = "P:";
         }
     }
 
@@ -179,7 +181,7 @@ public partial class CirclesPageViewModel : ViewModelBase
 
     private void DrawParabola(Pixel center, uint color = 0xFF0000FF)
     {
-        var points = ParabolaGenerator.DrawParabola(center, A, B, BitmapWidth, color);
+        var points = ParabolaGenerator.DrawParabola(center, Radius, BitmapWidth, color);
         _debuggableBitmapControl.AddPoints(points);
         if (!IsDebugEnabled)
             _toastManager.ShowToast("Нарисована парабола", $"Центр: {center}, A: {A}, B: {B}",

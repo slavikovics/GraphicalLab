@@ -33,16 +33,16 @@ public static class EllipseGenerator
             if (d1 < 0)
             {
                 x++;
-                dx = dx + 2.0 * b2;
-                d1 = d1 + dx + b2;
+                dx += 2.0 * b2;
+                d1 += dx + b2;
             }
             else
             {
                 x++;
                 y--;
-                dx = dx + 2.0 * b2;
-                dy = dy - 2.0 * a2;
-                d1 = d1 + dx - dy + b2;
+                dx += 2.0 * b2;
+                dy -= 2.0 * a2;
+                d1 += dx - dy + b2;
             }
         }
 
@@ -55,16 +55,16 @@ public static class EllipseGenerator
             if (d2 > 0)
             {
                 y--;
-                dy = dy - 2.0 * a2;
-                d2 = d2 + a2 - dy;
+                dy -= 2.0 * a2;
+                d2 += a2 - dy;
             }
             else
             {
                 x++;
                 y--;
-                dx = dx + 2.0 * b2;
-                dy = dy - 2.0 * a2;
-                d2 = d2 + dx - dy + a2;
+                dx += 2.0 * b2;
+                dy -= 2.0 * a2;
+                d2 += dx - dy + a2;
             }
         }
 

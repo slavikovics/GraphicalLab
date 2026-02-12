@@ -36,10 +36,9 @@
                             <TextBlock VerticalAlignment="Center"
                                        Margin="3" />
                             <TextBlock VerticalAlignment="Center"
+                                       Text="{Binding ParameterName}"
                                        IsVisible="{Binding IsRadiusVisible}"
-                                       Margin="3">
-                                R:
-                            </TextBlock>
+                                       Margin="3"/>
                             <NumericUpDown Minimum="1"
                                            Maximum="100"
                                            IsVisible="{Binding IsRadiusVisible}"

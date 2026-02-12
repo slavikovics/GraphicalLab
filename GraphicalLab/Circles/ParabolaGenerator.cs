@@ -5,43 +5,62 @@ namespace GraphicalLab.Circles;
 
 public static class ParabolaGenerator
 {
-    public static List<Pixel> DrawParabola(
-        Pixel center,
-        int a,
-        int b,
-        int max,
-        uint color = 0xFF0000FF)
+    public static List<Pixel> DrawParabola(Pixel center, int p, int maxX, uint color = 0xFF0000FF)
     {
-        var pixels = new List<Pixel>();
+        var pointsSet = new HashSet<(int, int)>();
 
-        int y = 0;
-        int x = 0;
-
-        int dx = a + b;
-        int ddx = 2 * a;
-
-        int prevX = x;
-        int prevY = y;
-
-        while (prevY <= max && prevX <= max)
+        void AddSym(int x, int y)
         {
-            int from = Math.Min(prevX, x);
-            int to = Math.Max(prevX, x);
-
-            for (int xx = from; xx <= to; xx++)
-            {
-                pixels.Add(new Pixel(center.X + xx, center.Y + y, color));
-                pixels.Add(new Pixel(center.X + xx, center.Y - y, color));
-            }
-
-            prevX = x;
-            prevY = y;
-
-            y++;
-            x += dx;
-            dx += ddx;
+            pointsSet.Add((y, x));
+            pointsSet.Add((-y, x));
         }
 
-        return pixels;
+        int x = 0;
+        int y = 0;
+        AddSym(x, y);
+
+        int d1 = 1 - 2 * p;
+
+        while (y < 2 * p && x <= maxX)
+        {
+            if (d1 <= 0)
+            {
+                d1 += 2 * y + 3;
+            }
+            else
+            {
+                d1 += 2 * y + 3 - 4 * p;
+                x++;
+            }
+
+            y++;
+            AddSym(x, y);
+        }
+
+        int d2 = (2 * y + 1) * (2 * y + 1) - 16 * p * (x + 1);
+
+        while (x <= maxX)
+        {
+            if (d2 <= 0)
+            {
+                d2 += 8 * (y + 1) - 16 * p;
+                y++;
+            }
+            else
+            {
+                d2 -= 16 * p;
+            }
+
+            x++;
+            AddSym(x, y);
+        }
+
+        var result = new List<Pixel>(pointsSet.Count);
+        foreach (var (px, py) in pointsSet)
+        {
+            result.Add(new Pixel(center.X + px, center.Y + py, color));
+        }
+
+        return result;
     }
 }
