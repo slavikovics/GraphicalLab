@@ -184,7 +184,7 @@ public partial class CirclesPageViewModel : ViewModelBase
         var points = ParabolaGenerator.DrawParabola(center, Radius, BitmapWidth, color);
         _debuggableBitmapControl.AddPoints(points);
         if (!IsDebugEnabled)
-            _toastManager.ShowToast("Нарисована парабола", $"Центр: {center}, A: {A}, B: {B}",
+            _toastManager.ShowToast("Нарисована парабола", $"Центр: {center}, P: {Radius}",
                 NotificationType.Success);
     }
 
