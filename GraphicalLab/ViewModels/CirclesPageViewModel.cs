@@ -68,8 +68,7 @@ public partial class CirclesPageViewModel : ViewModelBase
         _debuggableBitmapControl = debuggableBitmapControl;
         _debuggableBitmapControl.WritableBitmapChanged += UpdateImage;
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
-        PropertyChanged += OnPropertyChanged;
-        InitializeLines();
+        PropertyChanged += OnPropertyChangedInitializeCircles();
         InitializeProperties();
     }
 
@@ -120,7 +119,7 @@ public partial class CirclesPageViewModel : ViewModelBase
         StepsCountText = _debuggableBitmapControl.StepsCountText;
     }
 
-    private void InitializeLines()
+    private void InitializeCircles()
     {
         _circleTypesMatch = new Dictionary<int, DrawCircleDelegate>();
         var ddaDelegate = new DrawCircleDelegate(DrawCircle);

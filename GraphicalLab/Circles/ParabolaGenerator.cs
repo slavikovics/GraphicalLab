@@ -27,7 +27,7 @@ public static class ParabolaGenerator
             {
                 d1 += 2 * y + 3;
             }
-            else
+            else 
             {
                 d1 += 2 * y + 3 - 4 * p;
                 x++;
