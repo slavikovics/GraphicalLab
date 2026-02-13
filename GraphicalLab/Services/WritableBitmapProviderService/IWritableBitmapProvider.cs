@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media.Imaging;
+using GraphicalLab.Models;
 
 namespace GraphicalLab.Services.WritableBitmapProviderService;
 

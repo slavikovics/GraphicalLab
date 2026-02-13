@@ -6,6 +6,7 @@
              xmlns:vm="using:GraphicalLab.ViewModels"
              xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:graphicalLab="clr-namespace:GraphicalLab"
+             xmlns:controls="clr-namespace:GraphicalLab.Controls"
              x:DataType="vm:CirclesPageViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="GraphicalLab.Views.CirclesPage">
@@ -129,7 +130,7 @@
                            Stretch="Uniform"
                            RenderOptions.BitmapInterpolationMode="None"
                            Source="{Binding Bitmap}" />
-                    <graphicalLab:PixelGridOverlay
+                    <controls:PixelGridOverlay
                         BitmapWidth="{Binding BitmapWidth}"
                         BitmapHeight="{Binding BitmapHeight}"
                         IsHitTestVisible="False"

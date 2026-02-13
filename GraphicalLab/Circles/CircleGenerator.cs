@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Avalonia.Input;
+using GraphicalLab.Models;
 
 namespace GraphicalLab.Circles;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using GraphicalLab.Models;
 using GraphicalLab.Services.WritableBitmapProviderService;
 
 namespace GraphicalLab.Services.DebugControlService;

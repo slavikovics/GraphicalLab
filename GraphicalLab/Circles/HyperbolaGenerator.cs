@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraphicalLab.Models;
 
 namespace GraphicalLab.Circles;
 

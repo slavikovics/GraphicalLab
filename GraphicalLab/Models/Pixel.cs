@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GraphicalLab;
+namespace GraphicalLab.Models;
 
 public class Pixel
 {

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using GraphicalLab.Models;
 
 namespace GraphicalLab.Services.WritableBitmapProviderService;
 
