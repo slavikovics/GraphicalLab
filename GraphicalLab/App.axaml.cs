@@ -25,6 +25,7 @@ public partial class App : Application
         serviceCollection.AddSingleton<MainWindowViewModel>();
         serviceCollection.AddSingleton<LinesPageViewModel>();
         serviceCollection.AddSingleton<CirclesPageViewModel>();
+        serviceCollection.AddSingleton<CurvesPageViewModel>();
         ServiceProvider = serviceCollection.BuildServiceProvider();
     }
 

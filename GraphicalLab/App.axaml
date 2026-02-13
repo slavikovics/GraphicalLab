@@ -24,6 +24,9 @@
         <DataTemplate DataType="vm:CirclesPageViewModel">
             <views:CirclesPage/>
         </DataTemplate>
+        <DataTemplate DataType="vm:CurvesPageViewModel">
+            <views:CurvesPage/>
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>

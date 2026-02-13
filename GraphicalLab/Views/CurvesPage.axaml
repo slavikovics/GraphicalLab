@@ -1,0 +1,141 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:vm="using:GraphicalLab.ViewModels"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:graphicalLab="clr-namespace:GraphicalLab"
+             x:DataType="vm:CurvesPageViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="GraphicalLab.Views.CurvesPage">
+    <ScrollViewer>
+        <StackPanel Spacing="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+
+                <Border BorderThickness="1"
+                        CornerRadius="100"
+                        Margin="10 10 5 0"
+                        BorderBrush="#353535"
+                        Grid.Column="0">
+                    <suki:GlassCard CornerRadius="100"
+                                    Height="70">
+                        <StackPanel HorizontalAlignment="Center"
+                                    Orientation="Horizontal">
+                            <avalonia:MaterialIcon Width="20"
+                                                   HorizontalAlignment="Right"
+                                                   Height="20"
+                                                   Margin="3"
+                                                   Kind="CircleEditOutline" />
+                            <ComboBox SelectedIndex="{Binding SelectedCircleIndex}"
+                                      ItemsSource="{Binding CircleTypes}"/>
+                            <TextBlock VerticalAlignment="Center"
+                                       Margin="3" />
+                            <TextBlock VerticalAlignment="Center"
+                                       Text="{Binding ParameterName}"
+                                       IsVisible="{Binding IsRadiusVisible}"
+                                       Margin="3"/>
+                            <NumericUpDown Minimum="1"
+                                           Maximum="100"
+                                           IsVisible="{Binding IsRadiusVisible}"
+                                           FormatString="0"
+                                           Value="{Binding Radius}" />
+                            <TextBlock VerticalAlignment="Center"
+                                       IsVisible="{Binding IsAVisible}"
+                                       Margin="5">
+                                A:
+                            </TextBlock>
+                            <NumericUpDown Minimum="1"
+                                           Maximum="100"
+                                           Width="80"
+                                           IsVisible="{Binding IsAVisible}"
+                                           FormatString="0"
+                                           Value="{Binding A}" />
+                            <TextBlock VerticalAlignment="Center"
+                                       IsVisible="{Binding IsBVisible}"
+                                       Margin="5">
+                                B:
+                            </TextBlock>
+                            <NumericUpDown Minimum="1"
+                                           Maximum="100"
+                                           Width="80"
+                                           IsVisible="{Binding IsBVisible}"
+                                           FormatString="0"
+                                           Value="{Binding B}" />
+                        </StackPanel>
+                    </suki:GlassCard>
+                </Border>
+                <Border Grid.Column="1"
+                        Margin="5 10 5 0"
+                        CornerRadius="100"
+                        BorderThickness="1"
+                        BorderBrush="#353535">
+                    <suki:GlassCard CornerRadius="100"
+                                    Height="70"
+                                    Padding="0">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="5 15 0 10">
+                                <ToggleSwitch Padding="0"
+                                              Margin="0"
+                                              IsChecked="{Binding IsGridVisible}" />
+                                <TextBlock Margin="0"
+                                           Padding="0"
+                                           VerticalAlignment="Center">
+                                    Сетка
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="10 15 0 10">
+                                <ToggleSwitch IsChecked="{Binding IsDebugEnabled}" />
+                                <TextBlock VerticalAlignment="Center">Отладка</TextBlock>
+                            </StackPanel>
+                            <Button Margin="15 10 8 10"
+                                    FontSize="15"
+                                    Padding="5 0 5 0"
+                                    IsEnabled="{Binding IsNextStepAvailable}"
+                                    Command="{Binding HandleDebugNextStepCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <avalonia:MaterialIcon Width="30"
+                                                           Height="30"
+                                                           Kind="SkipNext" />
+                                    <TextBlock Margin="0 0 5 0"
+                                               VerticalAlignment="Center"
+                                               IsVisible="{Binding IsDebugEnabled}"
+                                               Text="{Binding StepsCountText}" />
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding ClearBitmapCommand}" Margin="8 10 10 10"
+                                    FontSize="15">
+                                <avalonia:MaterialIcon Width="30"
+                                                       HorizontalAlignment="Right"
+                                                       Height="30"
+                                                       Kind="Cleaning" />
+                            </Button>
+                        </StackPanel>
+                    </suki:GlassCard>
+                </Border>
+            </Grid>
+            <Border Margin="10 0 5 10" BorderThickness="1"
+                    BorderBrush="#353535">
+                <Grid>
+                    <Image PointerPressed="Image_OnPointerPressed"
+                           Name="Image"
+                           Stretch="Uniform"
+                           RenderOptions.BitmapInterpolationMode="None"
+                           Source="{Binding Bitmap}" />
+                    <graphicalLab:PixelGridOverlay
+                        BitmapWidth="{Binding BitmapWidth}"
+                        BitmapHeight="{Binding BitmapHeight}"
+                        IsHitTestVisible="False"
+                        IsVisible="{Binding IsGridVisible}" />
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

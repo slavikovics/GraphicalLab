@@ -6,7 +6,6 @@
                  xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:graphicalEditor="clr-namespace:GraphicalLab"
                  mc:Ignorable="d"
                  d:DesignWidth="800"
                  d:DesignHeight="450"
@@ -49,7 +48,7 @@
                 </suki:SukiSideMenuItem.PageContent>
             </suki:SukiSideMenuItem>
 
-            <!-- Other Pages -->
+            <!-- Circles Page -->
 
             <suki:SukiSideMenuItem Header="Кривые 2 п.">
                 <suki:SukiSideMenuItem.Icon>
@@ -61,6 +60,21 @@
                 </suki:SukiSideMenuItem.Icon>
                 <suki:SukiSideMenuItem.PageContent>
                     <ContentControl Content="{Binding CirclesPageViewModel}"/>
+                </suki:SukiSideMenuItem.PageContent>
+            </suki:SukiSideMenuItem>
+            
+            <!-- Curves Page -->
+            
+            <suki:SukiSideMenuItem Header="Кривые">
+                <suki:SukiSideMenuItem.Icon>
+                    <avalonia:MaterialIcon Width="20"
+                                           Height="20"
+                                           VerticalAlignment="Center"
+                                           Foreground="White"
+                                           Kind="VectorCurve" />
+                </suki:SukiSideMenuItem.Icon>
+                <suki:SukiSideMenuItem.PageContent>
+                    <ContentControl Content="{Binding CurvesPageViewModel}"/>
                 </suki:SukiSideMenuItem.PageContent>
             </suki:SukiSideMenuItem>
             

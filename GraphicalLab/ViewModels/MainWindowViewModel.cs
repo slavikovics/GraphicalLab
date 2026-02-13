@@ -9,11 +9,17 @@ public partial class MainWindowViewModel : ViewModelBase
     public ISukiToastManager ToastManager => _toastManager.GetToastManager();
     public LinesPageViewModel LinesPageViewModel { get; }
     public CirclesPageViewModel CirclesPageViewModel { get; }
+    public CurvesPageViewModel CurvesPageViewModel { get; }
 
-    public MainWindowViewModel(IToastManager toastManager, LinesPageViewModel linesPageViewModel, CirclesPageViewModel circlesPageViewModel)
+    public MainWindowViewModel(
+        IToastManager toastManager,
+        LinesPageViewModel linesPageViewModel,
+        CirclesPageViewModel circlesPageViewModel,
+        CurvesPageViewModel curvesPageViewModel)
     {
         _toastManager = toastManager;
         LinesPageViewModel = linesPageViewModel;
         CirclesPageViewModel = circlesPageViewModel;
+        CurvesPageViewModel = curvesPageViewModel;
     }
 }
