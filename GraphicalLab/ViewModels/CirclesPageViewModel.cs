@@ -68,7 +68,8 @@ public partial class CirclesPageViewModel : ViewModelBase
         _debuggableBitmapControl = debuggableBitmapControl;
         _debuggableBitmapControl.WritableBitmapChanged += UpdateImage;
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
-        PropertyChanged += OnPropertyChangedInitializeCircles();
+        PropertyChanged += OnPropertyChanged;
+        InitializeCircles();
         InitializeProperties();
     }
 
