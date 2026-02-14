@@ -67,13 +67,9 @@ public class WaypointControl : Ellipse
 
         _isDragging = true;
 
-        // Сохраняем позицию начала перетаскивания в абсолютных координатах Canvas
         _dragStartPosition = e.GetPosition(_canvas);
-
-        // Сохраняем размер Canvas в момент начала перетаскивания
         _canvasSizeAtDragStart = _canvas.Bounds.Size;
 
-        // Сохраняем начальные относительные координаты модели
         _initialRelativeX = model.X;
         _initialRelativeY = model.Y;
 
@@ -87,28 +83,22 @@ public class WaypointControl : Ellipse
 
         var model = DataContext as WaypointModel;
         if (model == null) return;
-
-        // Текущая позиция мыши в абсолютных координатах Canvas
+        
         var currentAbsolutePosition = e.GetPosition(_canvas);
-
-        // Вычисляем смещение в абсолютных пикселях
+        
         var deltaX = currentAbsolutePosition.X - _dragStartPosition.X;
         var deltaY = currentAbsolutePosition.Y - _dragStartPosition.Y;
-
-        // Конвертируем абсолютное смещение в относительное (с учетом текущего размера Canvas)
-        // Используем размер Canvas на момент начала перетаскивания для консистентности
+        
         double relativeDeltaX = _canvasSizeAtDragStart.Width > 0
             ? deltaX / _canvasSizeAtDragStart.Width
             : 0;
         double relativeDeltaY = _canvasSizeAtDragStart.Height > 0
             ? deltaY / _canvasSizeAtDragStart.Height
             : 0;
-
-        // Вычисляем новую относительную позицию
+        
         double newRelativeX = _initialRelativeX + relativeDeltaX;
         double newRelativeY = _initialRelativeY + relativeDeltaY;
-
-        // Обновляем модель (ограничение координат происходит в сеттере модели)
+        
         model.X = newRelativeX;
         model.Y = newRelativeY;
 
@@ -126,15 +116,13 @@ public class WaypointControl : Ellipse
         _isDragging = false;
         e.Pointer.Capture(null);
 
-        // Проверяем, было ли это нажатие (не перетаскивание)
         var endPosition = e.GetPosition(_canvas);
         var dragDistance = Math.Sqrt(
             Math.Pow(endPosition.X - _dragStartPosition.X, 2) +
             Math.Pow(endPosition.Y - _dragStartPosition.Y, 2)
         );
-
-        // Если движение было минимальным, считаем это кликом
-        if (dragDistance < 5) // Порог чувствительности
+        
+        if (dragDistance < 5)
         {
             ClickCommand?.Execute(model);
         }

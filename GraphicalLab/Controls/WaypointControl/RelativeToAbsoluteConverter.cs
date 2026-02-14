@@ -14,11 +14,8 @@ public class RelativeToAbsoluteConverter : IMultiValueConverter
             values[1] is double canvasSize)
         {
             var offset = parameter as double? ?? 0;
-            
-            // Ограничиваем относительную координату диапазоном [0, 1]
             relativeCoord = Math.Max(0, Math.Min(1, relativeCoord));
             
-            // Преобразуем в абсолютные пиксели и применяем смещение для центрирования
             return (relativeCoord * canvasSize) - offset;
         }
         return 0.0;

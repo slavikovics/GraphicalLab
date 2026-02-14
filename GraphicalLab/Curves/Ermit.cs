@@ -83,7 +83,7 @@ public class Ermit : ICurveGenerator
 
         var geometryMatrix = GenerateGeometryMatrix(p1, p4, r1, r4);
 
-        for (double t = 0; t <= 1; t += 0.01)
+        for (double t = 0; t <= 1; t += 0.001)
         {
             var vector = GenerateTVector(t);
             var result = vector * _ermitMatrix * geometryMatrix;
