@@ -19,6 +19,7 @@ public partial class CurvesPageViewModel : ViewModelBase
     private readonly IDebuggableBitmapControl _debuggableBitmapControl;
     private readonly ICurveGenerator _ermitCurveGenerator = new Ermit();
     private readonly ICurveGenerator _bezieCurveGenerator = new Bezie();
+    private readonly ICurveGenerator _splineCurveGenerator = new Spline();
 
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
@@ -210,6 +211,12 @@ public partial class CurvesPageViewModel : ViewModelBase
 
     private void DrawSpline()
     {
+        var curves = Curve.CreateCurves(_selectedWaypoints, new Size(BitmapWidth, BitmapHeight), _splineCurveGenerator);
+        if (curves != null)
+        {
+            _curves.AddRange(curves);
+            Redraw();
+        }
     }
 
     private void Redraw()

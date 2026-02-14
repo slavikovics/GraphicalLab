@@ -5,12 +5,17 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 namespace GraphicalLab.Controls.WaypointControl;
 
 public class WaypointControl : Ellipse
 {
+    private DispatcherTimer? _throttleTimer;
+    private Point _lastProcessedPosition;
+    private bool _hasPendingUpdate;
+
     public static readonly StyledProperty<ICommand?> ClickCommandProperty =
         AvaloniaProperty.Register<WaypointControl, ICommand?>(nameof(ClickCommand));
 
@@ -44,6 +49,48 @@ public class WaypointControl : Ellipse
         PointerPressed += OnPointerPressed;
         PointerMoved += OnPointerMoved;
         PointerReleased += OnPointerReleased;
+
+        _throttleTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(10)
+        };
+        _throttleTimer.Tick += OnThrottleTimerTick;
+    }
+
+    private void OnThrottleTimerTick(object? sender, EventArgs e)
+    {
+        if (!_hasPendingUpdate || !_isDragging || _canvas == null)
+        {
+            _throttleTimer?.Stop();
+            return;
+        }
+
+        UpdatePosition(_lastProcessedPosition);
+        _hasPendingUpdate = false;
+    }
+
+    private void UpdatePosition(Point currentAbsolutePosition)
+    {
+        var model = DataContext as WaypointModel;
+        if (model == null) return;
+
+        var deltaX = currentAbsolutePosition.X - _dragStartPosition.X;
+        var deltaY = currentAbsolutePosition.Y - _dragStartPosition.Y;
+
+        double relativeDeltaX = _canvasSizeAtDragStart.Width > 0
+            ? deltaX / _canvasSizeAtDragStart.Width
+            : 0;
+        double relativeDeltaY = _canvasSizeAtDragStart.Height > 0
+            ? deltaY / _canvasSizeAtDragStart.Height
+            : 0;
+
+        double newRelativeX = _initialRelativeX + relativeDeltaX;
+        double newRelativeY = _initialRelativeY + relativeDeltaY;
+
+        model.X = newRelativeX;
+        model.Y = newRelativeY;
+
+        DragCommand?.Execute(model);
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -81,34 +128,22 @@ public class WaypointControl : Ellipse
     {
         if (!_isDragging || _canvas == null) return;
 
-        var model = DataContext as WaypointModel;
-        if (model == null) return;
-        
-        var currentAbsolutePosition = e.GetPosition(_canvas);
-        
-        var deltaX = currentAbsolutePosition.X - _dragStartPosition.X;
-        var deltaY = currentAbsolutePosition.Y - _dragStartPosition.Y;
-        
-        double relativeDeltaX = _canvasSizeAtDragStart.Width > 0
-            ? deltaX / _canvasSizeAtDragStart.Width
-            : 0;
-        double relativeDeltaY = _canvasSizeAtDragStart.Height > 0
-            ? deltaY / _canvasSizeAtDragStart.Height
-            : 0;
-        
-        double newRelativeX = _initialRelativeX + relativeDeltaX;
-        double newRelativeY = _initialRelativeY + relativeDeltaY;
-        
-        model.X = newRelativeX;
-        model.Y = newRelativeY;
+        var currentPosition = e.GetPosition(_canvas);
+        _lastProcessedPosition = currentPosition;
+        _hasPendingUpdate = true;
 
-        DragCommand?.Execute(model);
+        if (!_throttleTimer!.IsEnabled)
+            _throttleTimer.Start();
+
         e.Handled = true;
     }
 
     private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (!_isDragging || _canvas == null) return;
+
+        _throttleTimer?.Stop();
+        _hasPendingUpdate = false;
 
         var model = DataContext as WaypointModel;
         if (model == null) return;
@@ -121,7 +156,7 @@ public class WaypointControl : Ellipse
             Math.Pow(endPosition.X - _dragStartPosition.X, 2) +
             Math.Pow(endPosition.Y - _dragStartPosition.Y, 2)
         );
-        
+
         if (dragDistance < 5)
         {
             ClickCommand?.Execute(model);

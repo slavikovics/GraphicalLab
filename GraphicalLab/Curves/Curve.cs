@@ -47,17 +47,23 @@ public class Curve
         if (wayPoints.Count < 4) return null;
         List<Curve> curves = [];
 
-        for (int i = 0; i <= wayPoints.Count - 4; i += 3)
+        if (generator is not Spline)
         {
-            var firstWaypoint = wayPoints[i];
-            var secondWaypoint = wayPoints[i + 1];
-            var thirdWaypoint = wayPoints[i + 2];
-            var fourthWaypoint = wayPoints[i + 3];
+            for (int i = 0; i <= wayPoints.Count - 4; i += 3)
+            {
+                var firstWaypoint = wayPoints[i];
+                var secondWaypoint = wayPoints[i + 1];
+                var thirdWaypoint = wayPoints[i + 2];
+                var fourthWaypoint = wayPoints[i + 3];
 
-            var curve = new Curve([firstWaypoint, secondWaypoint, thirdWaypoint, fourthWaypoint], canvasSize, generator);
-            curves.Add(curve);
+                var curve = new Curve([firstWaypoint, secondWaypoint, thirdWaypoint, fourthWaypoint], canvasSize, generator);
+                curves.Add(curve);
+            }
+
+            return curves;
         }
 
+        curves.Add(new Curve(wayPoints, canvasSize, generator));
         return curves;
     }
 }

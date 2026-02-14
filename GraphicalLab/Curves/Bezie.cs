@@ -10,31 +10,31 @@ namespace GraphicalLab.Curves;
 
 public class Bezie : ICurveGenerator
 {
-    private readonly Matrix<double> _ermitMatrix;
+    private readonly Matrix<double> _bezieMatrix;
 
     public Bezie()
     {
-        _ermitMatrix = new Matrix<double>(4, 4);
+        _bezieMatrix = new Matrix<double>(4, 4);
 
-        _ermitMatrix.SetValue(0, 0, -1);
-        _ermitMatrix.SetValue(0, 1, 3);
-        _ermitMatrix.SetValue(0, 2, -3);
-        _ermitMatrix.SetValue(0, 3, 1);
+        _bezieMatrix.SetValue(0, 0, -1);
+        _bezieMatrix.SetValue(0, 1, 3);
+        _bezieMatrix.SetValue(0, 2, -3);
+        _bezieMatrix.SetValue(0, 3, 1);
 
-        _ermitMatrix.SetValue(1, 0, 3);
-        _ermitMatrix.SetValue(1, 1, -6);
-        _ermitMatrix.SetValue(1, 2, 3);
-        _ermitMatrix.SetValue(1, 3, 0);
+        _bezieMatrix.SetValue(1, 0, 3);
+        _bezieMatrix.SetValue(1, 1, -6);
+        _bezieMatrix.SetValue(1, 2, 3);
+        _bezieMatrix.SetValue(1, 3, 0);
 
-        _ermitMatrix.SetValue(2, 0, -3);
-        _ermitMatrix.SetValue(2, 1, 3);
-        _ermitMatrix.SetValue(2, 2, 0);
-        _ermitMatrix.SetValue(2, 3, 0);
+        _bezieMatrix.SetValue(2, 0, -3);
+        _bezieMatrix.SetValue(2, 1, 3);
+        _bezieMatrix.SetValue(2, 2, 0);
+        _bezieMatrix.SetValue(2, 3, 0);
 
-        _ermitMatrix.SetValue(3, 0, 1);
-        _ermitMatrix.SetValue(3, 1, 0);
-        _ermitMatrix.SetValue(3, 2, 0);
-        _ermitMatrix.SetValue(3, 3, 0);
+        _bezieMatrix.SetValue(3, 0, 1);
+        _bezieMatrix.SetValue(3, 1, 0);
+        _bezieMatrix.SetValue(3, 2, 0);
+        _bezieMatrix.SetValue(3, 3, 0);
     }
 
     private Matrix<double> GenerateGeometryMatrix(Point p1, Point p2, Point p3, Point p4)
@@ -79,10 +79,10 @@ public class Bezie : ICurveGenerator
         
         var geometryMatrix = GenerateGeometryMatrix(p1, p2, p3, p4);
 
-        for (double t = 0; t <= 1; t += 0.01)
+        for (double t = 0; t <= 1; t += 0.001)
         {
             var vector = GenerateTVector(t);
-            var result = vector * _ermitMatrix * geometryMatrix;
+            var result = vector * _bezieMatrix * geometryMatrix;
 
             var pixel = new Pixel(result.GetValue(0, 0), result.GetValue(0, 1));
             pixels.Add(pixel);
