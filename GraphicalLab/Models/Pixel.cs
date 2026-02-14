@@ -19,8 +19,8 @@ public class Pixel
 
     public Pixel(double x, double y, uint color = 0xFF0000FF, double intensity = 1)
     {
-        X = (int)x;
-        Y = (int)y;
+        X = (int)Math.Round(x);
+        Y = (int)Math.Round(y);
         Intensity = 1;
         Color = ApplyIntensityToColor(color, intensity);
     }
@@ -46,12 +46,17 @@ public class Pixel
                | ((uint)newG << 8)
                | newB;
     }
-    
+
+    protected bool Equals(Pixel other)
+    {
+        return X == other.X && Y == other.Y;
+    }
+
     public Pixel Swapped()
     {
         return new Pixel(Y, X, Color, Intensity);
     }
-    
+
     public void Swap()
     {
         (X, Y) = (Y, X);

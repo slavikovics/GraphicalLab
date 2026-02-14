@@ -17,6 +17,8 @@ public partial class CurvesPageViewModel : ViewModelBase
 {
     private readonly IToastManager _toastManager;
     private readonly IDebuggableBitmapControl _debuggableBitmapControl;
+    private readonly ICurveGenerator _ermitCurveGenerator = new Ermit();
+    private readonly ICurveGenerator _bezieCurveGenerator = new Bezie();
 
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
@@ -32,7 +34,7 @@ public partial class CurvesPageViewModel : ViewModelBase
     [ObservableProperty] private bool _removeOnClickEnabled = true;
     [ObservableProperty] private bool _connectOnClickEnabled = true;
     [ObservableProperty] private int _selectedWaypointsCount;
-    
+
     private readonly List<WaypointModel> _selectedWaypoints = [];
     private readonly List<Curve> _curves = [];
 
@@ -152,11 +154,9 @@ public partial class CurvesPageViewModel : ViewModelBase
             Waypoints.Remove(model);
             List<Curve> toRemove = [];
             foreach (var curve in _curves)
-            {
-                if (curve.FirstWaypoint == model || curve.SecondWaypoint == model)
+                if (curve.HasWaypoint(model))
                     toRemove.Add(curve);
-            }
-            
+
             foreach (var curve in toRemove) _curves.Remove(curve);
             Redraw();
         }
@@ -172,7 +172,7 @@ public partial class CurvesPageViewModel : ViewModelBase
                 _selectedWaypoints.Add(model);
                 _curveTypesMatch[SelectedCurveIndex].Invoke();
             }
-            
+
             SelectedWaypointsCount = _selectedWaypoints.Count;
         }
     }
@@ -190,15 +190,7 @@ public partial class CurvesPageViewModel : ViewModelBase
 
     private void DrawErmit()
     {
-    }
-
-    private void DrawBezie()
-    {
-    }
-
-    private void DrawSpline()
-    {
-        var curves = Curve.CreateSpline(_selectedWaypoints, new Size(BitmapWidth, BitmapHeight));
+        var curves = Curve.CreateCurves(_selectedWaypoints, new Size(BitmapWidth, BitmapHeight), _ermitCurveGenerator);
         if (curves != null)
         {
             _curves.AddRange(curves);
@@ -206,14 +198,24 @@ public partial class CurvesPageViewModel : ViewModelBase
         }
     }
 
+    private void DrawBezie()
+    {
+        var curves = Curve.CreateCurves(_selectedWaypoints, new Size(BitmapWidth, BitmapHeight), _bezieCurveGenerator);
+        if (curves != null)
+        {
+            _curves.AddRange(curves);
+            Redraw();
+        }
+    }
+
+    private void DrawSpline()
+    {
+    }
+
     private void Redraw()
     {
         _debuggableBitmapControl.ClearBitmap();
-        
-        foreach (var curve in _curves)
-        {
-            _debuggableBitmapControl.AddPoints(curve.Draw());
-        }
+        foreach (var curve in _curves) _debuggableBitmapControl.AddPoints(curve.Draw());
     }
 
     private void ClearSelectedWaypoints()

@@ -8,40 +8,53 @@ namespace GraphicalLab.Curves;
 
 public class Curve
 {
-    public WaypointModel FirstWaypoint { get; set; }
-    public WaypointModel SecondWaypoint { get; set; }
-    public List<Pixel> Pixels { get; set; }
-    private Size _canvasSize;
+    private List<WaypointModel> Waypoints { get; set; }
+    private List<Pixel> Pixels { get; set; }
+    private readonly Size _canvasSize;
+    private readonly ICurveGenerator _curveGenerator;
 
-    public Curve(WaypointModel firstWaypoint, WaypointModel secondWaypoint, Size canvasSize)
+    public Curve(List<WaypointModel> waypoints, Size canvasSize, ICurveGenerator generator)
     {
-        FirstWaypoint = firstWaypoint;
-        SecondWaypoint = secondWaypoint;
+        Waypoints = waypoints;
         _canvasSize = canvasSize;
+        _curveGenerator = generator;
+        
+        Pixels = [];
+    }
+
+    public List<Point> GetPoints()
+    {
+        var points = new List<Point>();
+        foreach (var waypoint in Waypoints)
+            points.Add(waypoint.GetAbsolutePosition(_canvasSize));
+        
+        return points;
+    }
+
+    public bool HasWaypoint(WaypointModel waypointModel)
+    {
+        return Waypoints.Contains(waypointModel);
     }
 
     public List<Pixel> Draw()
     {
-        var startPoint = FirstWaypoint.GetAbsolutePosition(_canvasSize);
-        var endPoint = SecondWaypoint.GetAbsolutePosition(_canvasSize);
-        var startPixel = new Pixel(startPoint.X, startPoint.Y);
-        var endPixel = new Pixel(endPoint.X, endPoint.Y);
-        Pixels = XiaolinWuLineGenerator.DrawLine(startPixel, endPixel);
-
+        Pixels = _curveGenerator.Draw(GetPoints());
         return Pixels;
     }
 
-    public static List<Curve>? CreateSpline(List<WaypointModel> wayPoints, Size canvasSize)
+    public static List<Curve>? CreateCurves(List<WaypointModel> wayPoints, Size canvasSize, ICurveGenerator generator)
     {
-        if (wayPoints.Count < 2) return null;
+        if (wayPoints.Count < 4) return null;
         List<Curve> curves = [];
-        
-        for (int i = 0; i < wayPoints.Count - 1; i++)
+
+        for (int i = 0; i <= wayPoints.Count - 4; i += 3)
         {
             var firstWaypoint = wayPoints[i];
             var secondWaypoint = wayPoints[i + 1];
-            
-            var curve = new Curve(firstWaypoint, secondWaypoint, canvasSize);
+            var thirdWaypoint = wayPoints[i + 2];
+            var fourthWaypoint = wayPoints[i + 3];
+
+            var curve = new Curve([firstWaypoint, secondWaypoint, thirdWaypoint, fourthWaypoint], canvasSize, generator);
             curves.Add(curve);
         }
 
