@@ -5,6 +5,7 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:vm="using:GraphicalLab.ViewModels"
              xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             xmlns:local="clr-namespace:GraphicalLab.Controls.WaypointControl"
              xmlns:graphicalLab="clr-namespace:GraphicalLab"
              xmlns:controls="clr-namespace:GraphicalLab.Controls"
              x:DataType="vm:CurvesPageViewModel"
@@ -34,39 +35,20 @@
                                                    Kind="CircleEditOutline" />
                             <ComboBox SelectedIndex="{Binding SelectedCircleIndex}"
                                       ItemsSource="{Binding CircleTypes}"/>
-                            <TextBlock VerticalAlignment="Center"
-                                       Margin="3" />
-                            <TextBlock VerticalAlignment="Center"
-                                       Text="{Binding ParameterName}"
-                                       IsVisible="{Binding IsRadiusVisible}"
-                                       Margin="3"/>
-                            <NumericUpDown Minimum="1"
-                                           Maximum="100"
-                                           IsVisible="{Binding IsRadiusVisible}"
-                                           FormatString="0"
-                                           Value="{Binding Radius}" />
-                            <TextBlock VerticalAlignment="Center"
-                                       IsVisible="{Binding IsAVisible}"
-                                       Margin="5">
-                                A:
-                            </TextBlock>
-                            <NumericUpDown Minimum="1"
-                                           Maximum="100"
-                                           Width="80"
-                                           IsVisible="{Binding IsAVisible}"
-                                           FormatString="0"
-                                           Value="{Binding A}" />
-                            <TextBlock VerticalAlignment="Center"
-                                       IsVisible="{Binding IsBVisible}"
-                                       Margin="5">
-                                B:
-                            </TextBlock>
-                            <NumericUpDown Minimum="1"
-                                           Maximum="100"
-                                           Width="80"
-                                           IsVisible="{Binding IsBVisible}"
-                                           FormatString="0"
-                                           Value="{Binding B}" />
+                            <Button Margin="5">
+                                <avalonia:MaterialIcon Width="20"
+                                                       HorizontalAlignment="Right"
+                                                       Height="20"
+                                                       Margin="3"
+                                                       Kind="Add" />
+                            </Button>
+                            <Button Margin="5">
+                                <avalonia:MaterialIcon Width="20"
+                                                       HorizontalAlignment="Right"
+                                                       Height="20"
+                                                       Margin="3"
+                                                       Kind="Remove" />
+                            </Button>
                         </StackPanel>
                     </suki:GlassCard>
                 </Border>
@@ -130,6 +112,12 @@
                            Stretch="Uniform"
                            RenderOptions.BitmapInterpolationMode="None"
                            Source="{Binding Bitmap}" />
+                    
+                    <local:WayPointsOverlay ItemsSource="{Binding Waypoints}"
+                                            Background="Transparent"
+                                            CanvasClickCommand="{Binding AddWaypointCommand}"
+                                            ItemClickedCommand="{Binding WaypointClickedCommand}"
+                                            ItemDraggedCommand="{Binding WaypointDraggedCommand}"/>
                     <controls:PixelGridOverlay
                         BitmapWidth="{Binding BitmapWidth}"
                         BitmapHeight="{Binding BitmapHeight}"

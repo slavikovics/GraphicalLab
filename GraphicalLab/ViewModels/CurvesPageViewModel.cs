@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
@@ -7,6 +9,7 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Circles;
+using GraphicalLab.Controls.WaypointControl;
 using GraphicalLab.Models;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
@@ -33,7 +36,7 @@ public partial class CurvesPageViewModel : ViewModelBase
 
     [ObservableProperty] private bool _isAVisible;
     [ObservableProperty] private int _a;
-    
+
     [ObservableProperty] private bool _isBVisible;
     [ObservableProperty] private int _b;
 
@@ -57,11 +60,14 @@ public partial class CurvesPageViewModel : ViewModelBase
         }
     }
 
-    [ObservableProperty] private List<string> _circleTypes = ["Окружность", "Эллипс", "Гипербола", "Парабола"];
+    [ObservableProperty] private List<string> _circleTypes = ["Эрмит", "Безье", "B-Сплайн"];
     [ObservableProperty] private string _parameterName = "R:";
 
     private delegate void DrawCircleDelegate(Pixel center, uint color);
-    private Dictionary<int, DrawCircleDelegate> _circleTypesMatch = null!;
+
+    private Dictionary<int, DrawCircleDelegate> _curveTypesMatch = null!;
+
+    public ObservableCollection<WaypointModel> Waypoints { get; } = [];
 
     public CurvesPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
     {
@@ -78,9 +84,12 @@ public partial class CurvesPageViewModel : ViewModelBase
     {
         if (e.PropertyName == nameof(SelectedCircleIndex))
         {
-            IsRadiusVisible = CircleTypes[SelectedCircleIndex] == "Окружность" || CircleTypes[SelectedCircleIndex] == "Парабола";
-            IsAVisible = CircleTypes[SelectedCircleIndex] != "Окружность" && CircleTypes[SelectedCircleIndex] != "Парабола";
-            IsBVisible = CircleTypes[SelectedCircleIndex] != "Окружность" && CircleTypes[SelectedCircleIndex] != "Парабола";
+            IsRadiusVisible = CircleTypes[SelectedCircleIndex] == "Окружность" ||
+                              CircleTypes[SelectedCircleIndex] == "Парабола";
+            IsAVisible = CircleTypes[SelectedCircleIndex] != "Окружность" &&
+                         CircleTypes[SelectedCircleIndex] != "Парабола";
+            IsBVisible = CircleTypes[SelectedCircleIndex] != "Окружность" &&
+                         CircleTypes[SelectedCircleIndex] != "Парабола";
             if (CircleTypes[SelectedCircleIndex] == "Окружность") ParameterName = "R:";
             else ParameterName = "P:";
         }
@@ -123,15 +132,14 @@ public partial class CurvesPageViewModel : ViewModelBase
 
     private void InitializeCircles()
     {
-        _circleTypesMatch = new Dictionary<int, DrawCircleDelegate>();
-        var ddaDelegate = new DrawCircleDelegate(DrawCircle);
-        var brezenhemDelegate = new DrawCircleDelegate(DrawEllipse);
-        var wuDelegate = new DrawCircleDelegate(DrawHyperbola);
+        _curveTypesMatch = new Dictionary<int, DrawCircleDelegate>();
+        var ddaDelegate = new DrawCircleDelegate(DrawErmit);
+        var brezenhemDelegate = new DrawCircleDelegate(DrawBezie);
+        var wuDelegate = new DrawCircleDelegate(DrawSpline);
 
-        _circleTypesMatch.Add(0, DrawCircle);
-        _circleTypesMatch.Add(1, DrawEllipse);
-        _circleTypesMatch.Add(2, DrawHyperbola);
-        _circleTypesMatch.Add(3, DrawParabola);
+        _curveTypesMatch.Add(0, DrawErmit);
+        _curveTypesMatch.Add(1, DrawBezie);
+        _curveTypesMatch.Add(2, DrawSpline);
     }
 
     [RelayCommand]
@@ -145,7 +153,25 @@ public partial class CurvesPageViewModel : ViewModelBase
         int y = (int)(point.Y / scale);
 
         var center = new Pixel(x, y);
-        _circleTypesMatch[SelectedCircleIndex].Invoke(center, 0xFF0000FF);
+        _curveTypesMatch[SelectedCircleIndex].Invoke(center, 0xFF0000FF);
+    }
+
+    [RelayCommand]
+    private void AddWaypoint(Point center)
+    {
+        Waypoints.Add(new WaypointModel { X = center.X, Y = center.Y });
+    }
+
+    [RelayCommand]
+    private void WaypointClicked(WaypointModel? model)
+    {
+        
+    }
+    
+    [RelayCommand]
+    private void WaypointDragged(WaypointModel? model)
+    {
+        
     }
 
     private void UpdateImage()
@@ -153,7 +179,7 @@ public partial class CurvesPageViewModel : ViewModelBase
         TargetImage?.InvalidateVisual();
     }
 
-    private void DrawCircle(Pixel center, uint color = 0xFF0000FF)
+    private void DrawErmit(Pixel center, uint color = 0xFF0000FF)
     {
         var points = CircleGenerator.DrawCircle(center, Radius, color);
         _debuggableBitmapControl.AddPoints(points);
@@ -162,7 +188,7 @@ public partial class CurvesPageViewModel : ViewModelBase
                 NotificationType.Success);
     }
 
-    private void DrawEllipse(Pixel center, uint color = 0xFF0000FF)
+    private void DrawBezie(Pixel center, uint color = 0xFF0000FF)
     {
         var points = EllipseGenerator.DrawEllipse(center, A, B, color);
         _debuggableBitmapControl.AddPoints(points);
@@ -171,21 +197,12 @@ public partial class CurvesPageViewModel : ViewModelBase
                 NotificationType.Success);
     }
 
-    private void DrawHyperbola(Pixel center, uint color = 0xFF0000FF)
+    private void DrawSpline(Pixel center, uint color = 0xFF0000FF)
     {
         var points = HyperbolaGenerator.DrawHyperbola(center, A, B, BitmapWidth, BitmapHeight, color);
         _debuggableBitmapControl.AddPoints(points);
         if (!IsDebugEnabled)
             _toastManager.ShowToast("Нарисована гипербола", $"Центр: {center}, A: {A}, B: {B}",
-                NotificationType.Success);
-    }
-
-    private void DrawParabola(Pixel center, uint color = 0xFF0000FF)
-    {
-        var points = ParabolaGenerator.DrawParabola(center, Radius, BitmapWidth, color);
-        _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled)
-            _toastManager.ShowToast("Нарисована парабола", $"Центр: {center}, P: {Radius}",
                 NotificationType.Success);
     }
 
