@@ -32,38 +32,45 @@
                                                    HorizontalAlignment="Right"
                                                    Height="20"
                                                    Margin="3"
-                                                   Kind="CircleEditOutline" />
+                                                   Kind="VectorCurve" />
                             <ComboBox SelectedIndex="{Binding SelectedCurveIndex}"
-                                      ItemsSource="{Binding CircleTypes}"/>
+                                      ItemsSource="{Binding CircleTypes}" />
                             <Button Margin="5 0"
-                                    Height="40"
+                                    Height="50"
+                                    Padding="3"
                                     Command="{Binding AddButtonCommand}"
                                     IsEnabled="{Binding AddOnClickEnabled}">
                                 <avalonia:MaterialIcon Width="30"
                                                        HorizontalAlignment="Right"
                                                        Height="30"
                                                        Margin="3"
-                                                       Kind="Add" />
+                                                       Kind="PlusCircleOutline" />
                             </Button>
                             <Button Margin="5 0"
-                                    Height="40"
+                                    Height="50"
+                                    Padding="3"
                                     Command="{Binding RemoveButtonCommand}"
                                     IsEnabled="{Binding RemoveOnClickEnabled}">
                                 <avalonia:MaterialIcon Width="30"
                                                        HorizontalAlignment="Right"
                                                        Height="30"
                                                        Margin="3"
-                                                       Kind="Remove" />
+                                                       Kind="CloseCircleOutline" />
                             </Button>
                             <Button Margin="5 0"
-                                    Height="40"
+                                    Padding="3"
+                                    Height="50"
                                     Command="{Binding ConnectButtonCommand}"
                                     IsEnabled="{Binding ConnectOnClickEnabled}">
-                                <avalonia:MaterialIcon Width="30"
-                                                       HorizontalAlignment="Right"
-                                                       Height="30"
-                                                       Margin="3"
-                                                       Kind="Connection" />
+                                <StackPanel Orientation="Horizontal">
+                                    <avalonia:MaterialIcon Width="30"
+                                                           Height="30"
+                                                           Kind="TransitConnectionVariant" />
+                                    <TextBlock Margin="5 0"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding SelectedWaypointsCount}" />
+                                </StackPanel>
+
                             </Button>
                         </StackPanel>
                     </suki:GlassCard>
@@ -123,17 +130,16 @@
             <Border Margin="10 0 5 10" BorderThickness="1"
                     BorderBrush="#353535">
                 <Grid>
-                    <Image PointerPressed="Image_OnPointerPressed"
-                           Name="Image"
+                    <Image Name="Image"
                            Stretch="Uniform"
                            RenderOptions.BitmapInterpolationMode="None"
                            Source="{Binding Bitmap}" />
-                    
+
                     <local:WayPointsOverlay ItemsSource="{Binding Waypoints}"
                                             Background="Transparent"
                                             CanvasClickCommand="{Binding AddWaypointCommand}"
                                             ItemClickedCommand="{Binding WaypointClickedCommand}"
-                                            ItemDraggedCommand="{Binding WaypointDraggedCommand}"/>
+                                            ItemDraggedCommand="{Binding WaypointDraggedCommand}" />
                     <controls:PixelGridOverlay
                         BitmapWidth="{Binding BitmapWidth}"
                         BitmapHeight="{Binding BitmapHeight}"

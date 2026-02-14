@@ -3,13 +3,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Controls.WaypointControl;
 using GraphicalLab.Curves;
-using GraphicalLab.Models;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
 
@@ -33,10 +31,10 @@ public partial class CurvesPageViewModel : ViewModelBase
     [ObservableProperty] private bool _addOnClickEnabled;
     [ObservableProperty] private bool _removeOnClickEnabled = true;
     [ObservableProperty] private bool _connectOnClickEnabled = true;
-    private List<WaypointModel> _selectedWaypoints = [];
-    private List<Curve> _curves = [];
-    [ObservableProperty] private double _canvasWidth;
-    [ObservableProperty] private double _canvasHeight;
+    [ObservableProperty] private int _selectedWaypointsCount;
+    
+    private readonly List<WaypointModel> _selectedWaypoints = [];
+    private readonly List<Curve> _curves = [];
 
     public bool IsGridVisible
     {
@@ -99,6 +97,7 @@ public partial class CurvesPageViewModel : ViewModelBase
     {
         IsGridVisible = _debuggableBitmapControl.IsGridVisible;
         SelectedCurveIndex = 0;
+        SelectedWaypointsCount = 0;
         IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
         StepsCountText = _debuggableBitmapControl.StepsCountText;
@@ -113,26 +112,12 @@ public partial class CurvesPageViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void HandleClick(PointerPressedEventArgs e)
-    {
-        var point = e.GetPosition(TargetImage);
-        if (TargetImage is null) return;
-
-        double scale = TargetImage.Bounds.Width / BitmapWidth;
-        int x = (int)(point.X / scale);
-        int y = (int)(point.Y / scale);
-
-        var center = new Pixel(x, y);
-        _curveTypesMatch[SelectedCurveIndex].Invoke();
-    }
-
-    [RelayCommand]
     private void AddButton()
     {
         AddOnClickEnabled = false;
         RemoveOnClickEnabled = true;
         ConnectOnClickEnabled = true;
-        _selectedWaypoints.Clear();
+        ClearSelectedWaypoints();
     }
 
     [RelayCommand]
@@ -141,7 +126,7 @@ public partial class CurvesPageViewModel : ViewModelBase
         AddOnClickEnabled = true;
         RemoveOnClickEnabled = false;
         ConnectOnClickEnabled = true;
-        _selectedWaypoints.Clear();
+        ClearSelectedWaypoints();
     }
 
     [RelayCommand]
@@ -187,6 +172,8 @@ public partial class CurvesPageViewModel : ViewModelBase
                 _selectedWaypoints.Add(model);
                 _curveTypesMatch[SelectedCurveIndex].Invoke();
             }
+            
+            SelectedWaypointsCount = _selectedWaypoints.Count;
         }
     }
 
@@ -229,12 +216,19 @@ public partial class CurvesPageViewModel : ViewModelBase
         }
     }
 
+    private void ClearSelectedWaypoints()
+    {
+        _selectedWaypoints.Clear();
+        SelectedWaypointsCount = _selectedWaypoints.Count;
+    }
+
     [RelayCommand]
     public void ClearBitmap()
     {
         Waypoints.Clear();
         _curves.Clear();
         _debuggableBitmapControl.ClearBitmap();
+        ClearSelectedWaypoints();
     }
 
     [RelayCommand]
