@@ -18,7 +18,7 @@ public class Curve
         Waypoints = waypoints;
         _canvasSize = canvasSize;
         _curveGenerator = generator;
-        
+
         Pixels = [];
     }
 
@@ -27,7 +27,7 @@ public class Curve
         var points = new List<Point>();
         foreach (var waypoint in Waypoints)
             points.Add(waypoint.GetAbsolutePosition(_canvasSize));
-        
+
         return points;
     }
 
@@ -56,14 +56,25 @@ public class Curve
                 var thirdWaypoint = wayPoints[i + 2];
                 var fourthWaypoint = wayPoints[i + 3];
 
-                var curve = new Curve([firstWaypoint, secondWaypoint, thirdWaypoint, fourthWaypoint], canvasSize, generator);
+                var curve = new Curve([firstWaypoint, secondWaypoint, thirdWaypoint, fourthWaypoint], canvasSize,
+                    generator);
                 curves.Add(curve);
             }
 
             return curves;
         }
 
-        curves.Add(new Curve(wayPoints, canvasSize, generator));
+        for (int i = 0; i <= wayPoints.Count - 4; i++)
+        {
+            var p1 = wayPoints[i];
+            var p2 = wayPoints[i + 1];
+            var p3 = wayPoints[i + 2];
+            var p4 = wayPoints[i + 3];
+
+            var curve = new Curve([p1, p2, p3, p4], canvasSize, generator);
+            curves.Add(curve);
+        }
+
         return curves;
     }
 }

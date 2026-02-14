@@ -70,26 +70,23 @@ public class Spline : ICurveGenerator
     public List<Pixel> Draw(List<Point> waypoints, uint color = 4278190335)
     {
         var pixels = new List<Pixel>();
+        
+        var p1 = waypoints[0];
+        var p2 = waypoints[1];
+        var p3 = waypoints[2];
+        var p4 = waypoints[3];
 
-        for (int i = 1; i <= waypoints.Count - 3; i++)
+        var geometryMatrix = GenerateGeometryMatrix(p1, p2, p3, p4);
+
+        for (double t = 0; t <= 1; t += 0.001)
         {
-            var p1 = waypoints[i - 1];
-            var p2 = waypoints[i];
-            var p3 = waypoints[i + 1];
-            var p4 = waypoints[i + 2];
+            var vector = GenerateTVector(t);
+            var result = 1 / 6.0 * vector * _splineMatrix * geometryMatrix;
 
-            var geometryMatrix = GenerateGeometryMatrix(p1, p2, p3, p4);
-
-            for (double t = 0; t <= 1; t += 0.001)
-            {
-                var vector = GenerateTVector(t);
-                var result = 1 / 6.0 * vector * _splineMatrix * geometryMatrix;
-
-                var pixel = new Pixel(result.GetValue(0, 0), result.GetValue(0, 1));
-                pixels.Add(pixel);
-            }
+            var pixel = new Pixel(result.GetValue(0, 0), result.GetValue(0, 1));
+            pixels.Add(pixel);
         }
-
+        
         return pixels;
     }
 }
