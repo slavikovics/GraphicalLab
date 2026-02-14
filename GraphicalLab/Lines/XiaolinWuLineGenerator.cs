@@ -12,7 +12,7 @@ public static class XiaolinWuLineGenerator
     private static double RFractionalPart(double x)
         => 1.0 - FractionalPart(x);
 
-    public static List<Pixel> DrawLine(Pixel start, Pixel end, uint color)
+    public static List<Pixel> DrawLine(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
         var pixels = new List<Pixel>();
 

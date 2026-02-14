@@ -33,21 +33,37 @@
                                                    Height="20"
                                                    Margin="3"
                                                    Kind="CircleEditOutline" />
-                            <ComboBox SelectedIndex="{Binding SelectedCircleIndex}"
+                            <ComboBox SelectedIndex="{Binding SelectedCurveIndex}"
                                       ItemsSource="{Binding CircleTypes}"/>
-                            <Button Margin="5">
-                                <avalonia:MaterialIcon Width="20"
+                            <Button Margin="5 0"
+                                    Height="40"
+                                    Command="{Binding AddButtonCommand}"
+                                    IsEnabled="{Binding AddOnClickEnabled}">
+                                <avalonia:MaterialIcon Width="30"
                                                        HorizontalAlignment="Right"
-                                                       Height="20"
+                                                       Height="30"
                                                        Margin="3"
                                                        Kind="Add" />
                             </Button>
-                            <Button Margin="5">
-                                <avalonia:MaterialIcon Width="20"
+                            <Button Margin="5 0"
+                                    Height="40"
+                                    Command="{Binding RemoveButtonCommand}"
+                                    IsEnabled="{Binding RemoveOnClickEnabled}">
+                                <avalonia:MaterialIcon Width="30"
                                                        HorizontalAlignment="Right"
-                                                       Height="20"
+                                                       Height="30"
                                                        Margin="3"
                                                        Kind="Remove" />
+                            </Button>
+                            <Button Margin="5 0"
+                                    Height="40"
+                                    Command="{Binding ConnectButtonCommand}"
+                                    IsEnabled="{Binding ConnectOnClickEnabled}">
+                                <avalonia:MaterialIcon Width="30"
+                                                       HorizontalAlignment="Right"
+                                                       Height="30"
+                                                       Margin="3"
+                                                       Kind="Connection" />
                             </Button>
                         </StackPanel>
                     </suki:GlassCard>

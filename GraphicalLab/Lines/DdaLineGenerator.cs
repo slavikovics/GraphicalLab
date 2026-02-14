@@ -6,7 +6,7 @@ namespace GraphicalLab.Lines;
 
 public static class DdaLineGenerator
 {
-    public static List<Pixel> DrawLine(Pixel start, Pixel end, uint color)
+    public static List<Pixel> DrawLine(Pixel start, Pixel end, uint color = 0xFF0000FF)
     {
         List<Pixel> newPoints = [];
     

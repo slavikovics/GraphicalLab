@@ -3,13 +3,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GraphicalLab.Circles;
 using GraphicalLab.Controls.WaypointControl;
+using GraphicalLab.Curves;
 using GraphicalLab.Models;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
@@ -29,16 +28,15 @@ public partial class CurvesPageViewModel : ViewModelBase
 
     [ObservableProperty] private bool _isNextStepAvailable;
     [ObservableProperty] private string _stepsCountText;
-    [ObservableProperty] private int _selectedCircleIndex;
+    [ObservableProperty] private int _selectedCurveIndex;
 
-    [ObservableProperty] private bool _isRadiusVisible;
-    [ObservableProperty] private int _radius;
-
-    [ObservableProperty] private bool _isAVisible;
-    [ObservableProperty] private int _a;
-
-    [ObservableProperty] private bool _isBVisible;
-    [ObservableProperty] private int _b;
+    [ObservableProperty] private bool _addOnClickEnabled;
+    [ObservableProperty] private bool _removeOnClickEnabled = true;
+    [ObservableProperty] private bool _connectOnClickEnabled = true;
+    private List<WaypointModel> _selectedWaypoints = [];
+    private List<Curve> _curves = [];
+    [ObservableProperty] private double _canvasWidth;
+    [ObservableProperty] private double _canvasHeight;
 
     public bool IsGridVisible
     {
@@ -61,12 +59,10 @@ public partial class CurvesPageViewModel : ViewModelBase
     }
 
     [ObservableProperty] private List<string> _circleTypes = ["Эрмит", "Безье", "B-Сплайн"];
-    [ObservableProperty] private string _parameterName = "R:";
 
-    private delegate void DrawCircleDelegate(Pixel center, uint color);
+    private delegate void DrawCurveDelegate();
 
-    private Dictionary<int, DrawCircleDelegate> _curveTypesMatch = null!;
-
+    private Dictionary<int, DrawCurveDelegate> _curveTypesMatch = null!;
     public ObservableCollection<WaypointModel> Waypoints { get; } = [];
 
     public CurvesPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
@@ -75,24 +71,8 @@ public partial class CurvesPageViewModel : ViewModelBase
         _debuggableBitmapControl = debuggableBitmapControl;
         _debuggableBitmapControl.WritableBitmapChanged += UpdateImage;
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
-        PropertyChanged += OnPropertyChanged;
-        InitializeCircles();
+        InitializeCurves();
         InitializeProperties();
-    }
-
-    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(SelectedCircleIndex))
-        {
-            IsRadiusVisible = CircleTypes[SelectedCircleIndex] == "Окружность" ||
-                              CircleTypes[SelectedCircleIndex] == "Парабола";
-            IsAVisible = CircleTypes[SelectedCircleIndex] != "Окружность" &&
-                         CircleTypes[SelectedCircleIndex] != "Парабола";
-            IsBVisible = CircleTypes[SelectedCircleIndex] != "Окружность" &&
-                         CircleTypes[SelectedCircleIndex] != "Парабола";
-            if (CircleTypes[SelectedCircleIndex] == "Окружность") ParameterName = "R:";
-            else ParameterName = "P:";
-        }
     }
 
     private void DebuggableBitmapControlOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -118,25 +98,15 @@ public partial class CurvesPageViewModel : ViewModelBase
     private void InitializeProperties()
     {
         IsGridVisible = _debuggableBitmapControl.IsGridVisible;
-        SelectedCircleIndex = 0;
-        IsRadiusVisible = true;
-        IsAVisible = false;
-        IsBVisible = false;
-        Radius = 10;
-        A = 2;
-        B = 3;
+        SelectedCurveIndex = 0;
         IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
         StepsCountText = _debuggableBitmapControl.StepsCountText;
     }
 
-    private void InitializeCircles()
+    private void InitializeCurves()
     {
-        _curveTypesMatch = new Dictionary<int, DrawCircleDelegate>();
-        var ddaDelegate = new DrawCircleDelegate(DrawErmit);
-        var brezenhemDelegate = new DrawCircleDelegate(DrawBezie);
-        var wuDelegate = new DrawCircleDelegate(DrawSpline);
-
+        _curveTypesMatch = new Dictionary<int, DrawCurveDelegate>();
         _curveTypesMatch.Add(0, DrawErmit);
         _curveTypesMatch.Add(1, DrawBezie);
         _curveTypesMatch.Add(2, DrawSpline);
@@ -153,25 +123,77 @@ public partial class CurvesPageViewModel : ViewModelBase
         int y = (int)(point.Y / scale);
 
         var center = new Pixel(x, y);
-        _curveTypesMatch[SelectedCircleIndex].Invoke(center, 0xFF0000FF);
+        _curveTypesMatch[SelectedCurveIndex].Invoke();
+    }
+
+    [RelayCommand]
+    private void AddButton()
+    {
+        AddOnClickEnabled = false;
+        RemoveOnClickEnabled = true;
+        ConnectOnClickEnabled = true;
+        _selectedWaypoints.Clear();
+    }
+
+    [RelayCommand]
+    private void RemoveButton()
+    {
+        AddOnClickEnabled = true;
+        RemoveOnClickEnabled = false;
+        ConnectOnClickEnabled = true;
+        _selectedWaypoints.Clear();
+    }
+
+    [RelayCommand]
+    private void ConnectButton()
+    {
+        AddOnClickEnabled = true;
+        RemoveOnClickEnabled = true;
+        ConnectOnClickEnabled = false;
+        _selectedWaypoints.Clear();
     }
 
     [RelayCommand]
     private void AddWaypoint(Point center)
     {
-        Waypoints.Add(new WaypointModel { X = center.X, Y = center.Y });
+        if (!AddOnClickEnabled) Waypoints.Add(new WaypointModel { X = center.X, Y = center.Y });
     }
 
     [RelayCommand]
     private void WaypointClicked(WaypointModel? model)
     {
-        
+        if (!RemoveOnClickEnabled && model is not null)
+        {
+            Waypoints.Remove(model);
+            List<Curve> toRemove = [];
+            foreach (var curve in _curves)
+            {
+                if (curve.FirstWaypoint == model || curve.SecondWaypoint == model)
+                    toRemove.Add(curve);
+            }
+            
+            foreach (var curve in toRemove) _curves.Remove(curve);
+            Redraw();
+        }
+        else if (!ConnectOnClickEnabled && model is not null)
+        {
+            if (_selectedWaypoints.Contains(model))
+            {
+                _selectedWaypoints.Clear();
+                _selectedWaypoints.Add(model);
+            }
+            else
+            {
+                _selectedWaypoints.Add(model);
+                _curveTypesMatch[SelectedCurveIndex].Invoke();
+            }
+        }
     }
-    
+
     [RelayCommand]
     private void WaypointDragged(WaypointModel? model)
     {
-        
+        Redraw();
     }
 
     private void UpdateImage()
@@ -179,36 +201,39 @@ public partial class CurvesPageViewModel : ViewModelBase
         TargetImage?.InvalidateVisual();
     }
 
-    private void DrawErmit(Pixel center, uint color = 0xFF0000FF)
+    private void DrawErmit()
     {
-        var points = CircleGenerator.DrawCircle(center, Radius, color);
-        _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled)
-            _toastManager.ShowToast("Нарисована окружность", $"Центр: {center}, Радиус: {Radius}",
-                NotificationType.Success);
     }
 
-    private void DrawBezie(Pixel center, uint color = 0xFF0000FF)
+    private void DrawBezie()
     {
-        var points = EllipseGenerator.DrawEllipse(center, A, B, color);
-        _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled)
-            _toastManager.ShowToast("Нарисован эллипс", $"Центр: {center}, A: {A}, B: {B}",
-                NotificationType.Success);
     }
 
-    private void DrawSpline(Pixel center, uint color = 0xFF0000FF)
+    private void DrawSpline()
     {
-        var points = HyperbolaGenerator.DrawHyperbola(center, A, B, BitmapWidth, BitmapHeight, color);
-        _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled)
-            _toastManager.ShowToast("Нарисована гипербола", $"Центр: {center}, A: {A}, B: {B}",
-                NotificationType.Success);
+        var curves = Curve.CreateSpline(_selectedWaypoints, new Size(BitmapWidth, BitmapHeight));
+        if (curves != null)
+        {
+            _curves.AddRange(curves);
+            Redraw();
+        }
+    }
+
+    private void Redraw()
+    {
+        _debuggableBitmapControl.ClearBitmap();
+        
+        foreach (var curve in _curves)
+        {
+            _debuggableBitmapControl.AddPoints(curve.Draw());
+        }
     }
 
     [RelayCommand]
     public void ClearBitmap()
     {
+        Waypoints.Clear();
+        _curves.Clear();
         _debuggableBitmapControl.ClearBitmap();
     }
 
