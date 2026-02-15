@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Avalonia;
-using GraphicalLab.Controls.WaypointControl;
 using GraphicalLab.Matrix;
 using GraphicalLab.Models;
 
@@ -71,23 +69,31 @@ public class Bezie : ICurveGenerator
     public List<Pixel> Draw(List<Point> waypoints, uint color = 4278190335)
     {
         var pixels = new List<Pixel>();
-
+        var uniquePixels = new HashSet<(int X, int Y)>();
+    
         var p1 = waypoints[0];
         var p2 = waypoints[1];
         var p3 = waypoints[2];
         var p4 = waypoints[3];
-        
+    
         var geometryMatrix = GenerateGeometryMatrix(p1, p2, p3, p4);
+    
+        var bezieTimesGeometry = _bezieMatrix * geometryMatrix;
 
         for (double t = 0; t <= 1; t += 0.001)
         {
             var vector = GenerateTVector(t);
-            var result = vector * _bezieMatrix * geometryMatrix;
-
-            var pixel = new Pixel(result.GetValue(0, 0), result.GetValue(0, 1));
-            pixels.Add(pixel);
+            var result = vector * bezieTimesGeometry;
+        
+            int x = (int)Math.Round(result.GetValue(0, 0));
+            int y = (int)Math.Round(result.GetValue(0, 1));
+        
+            if (uniquePixels.Add((x, y)))
+            {
+                pixels.Add(new Pixel(x, y, color));
+            }
         }
-
+    
         return pixels;
     }
 }

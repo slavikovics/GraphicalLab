@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Avalonia;
 using GraphicalLab.Controls.WaypointControl;
-using GraphicalLab.Lines;
 using GraphicalLab.Models;
 
 namespace GraphicalLab.Curves;
@@ -9,7 +8,7 @@ namespace GraphicalLab.Curves;
 public class Curve
 {
     private List<WaypointModel> Waypoints { get; set; }
-    private List<Pixel> Pixels { get; set; }
+    public List<Pixel> Pixels { get; set; }
     private readonly Size _canvasSize;
     private readonly ICurveGenerator _curveGenerator;
 
@@ -40,6 +39,24 @@ public class Curve
     {
         Pixels = _curveGenerator.Draw(GetPoints());
         return Pixels;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Curve curve)
+        {
+            foreach (var point in Waypoints)
+            {
+                if (_curveGenerator != curve._curveGenerator) return false;
+                if (!curve.HasWaypoint(point)) return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+        
+        return true;
     }
 
     public static List<Curve>? CreateCurves(List<WaypointModel> wayPoints, Size canvasSize, ICurveGenerator generator)

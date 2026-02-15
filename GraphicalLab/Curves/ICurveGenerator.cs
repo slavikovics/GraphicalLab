@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Avalonia;
-using GraphicalLab.Controls.WaypointControl;
 using GraphicalLab.Models;
 
 namespace GraphicalLab.Curves;

@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Controls.WaypointControl;
 using GraphicalLab.Curves;
+using GraphicalLab.Models;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
 
@@ -144,7 +147,8 @@ public partial class CurvesPageViewModel : ViewModelBase
     [RelayCommand]
     private void AddWaypoint(Point center)
     {
-        if (!AddOnClickEnabled) Waypoints.Add(new WaypointModel { X = center.X, Y = center.Y });
+        if (AddOnClickEnabled) return;
+        Waypoints.Add(new WaypointModel { X = center.X, Y = center.Y });
     }
 
     [RelayCommand]
@@ -154,9 +158,7 @@ public partial class CurvesPageViewModel : ViewModelBase
         {
             Waypoints.Remove(model);
             List<Curve> toRemove = [];
-            foreach (var curve in _curves)
-                if (curve.HasWaypoint(model))
-                    toRemove.Add(curve);
+            toRemove.AddRange(_curves.Where(curve => curve.HasWaypoint(model)));
 
             foreach (var curve in toRemove) _curves.Remove(curve);
             Redraw();
@@ -192,37 +194,43 @@ public partial class CurvesPageViewModel : ViewModelBase
     private void DrawErmit()
     {
         var curves = Curve.CreateCurves(_selectedWaypoints, new Size(BitmapWidth, BitmapHeight), _ermitCurveGenerator);
-        if (curves != null)
-        {
-            _curves.AddRange(curves);
-            Redraw();
-        }
+        if (curves == null) return;
+        _selectedWaypoints.Clear();
+        _curves.AddRange(curves);
+        _toastManager.ShowToast("Информация", "Добавлена кривая Эрмита", NotificationType.Information);
+        Redraw();
     }
 
     private void DrawBezie()
     {
         var curves = Curve.CreateCurves(_selectedWaypoints, new Size(BitmapWidth, BitmapHeight), _bezieCurveGenerator);
-        if (curves != null)
-        {
-            _curves.AddRange(curves);
-            Redraw();
-        }
+        if (curves == null) return;
+        _selectedWaypoints.Clear();
+        _curves.AddRange(curves);
+        _toastManager.ShowToast("Информация", "Добавлена кривая Безье", NotificationType.Information);
+        Redraw();
     }
 
     private void DrawSpline()
     {
         var curves = Curve.CreateCurves(_selectedWaypoints, new Size(BitmapWidth, BitmapHeight), _splineCurveGenerator);
-        if (curves != null)
+        if (curves == null) return;
+        foreach (var curve in curves.Where(curve => !_curves.Contains(curve)))
         {
-            _curves.AddRange(curves);
-            Redraw();
+            _curves.Add(curve);
+            _toastManager.ShowToast("Информация", $"Добавлен фрагмент B-сплайна", NotificationType.Information);
         }
+
+        Redraw();
     }
 
     private void Redraw()
     {
+        List<Pixel> pixels = [];
+        foreach (var curve in _curves) pixels.AddRange(curve.Draw());
+
         _debuggableBitmapControl.ClearBitmap();
-        foreach (var curve in _curves) _debuggableBitmapControl.AddPoints(curve.Draw());
+        _debuggableBitmapControl.AddPoints(pixels);
     }
 
     private void ClearSelectedWaypoints()
