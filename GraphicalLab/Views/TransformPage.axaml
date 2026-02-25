@@ -35,45 +35,118 @@
                                                    Kind="VectorCurve" />
                             <ComboBox SelectedIndex="{Binding SelectedTransformIndex}"
                                       ItemsSource="{Binding TransformTypes}" />
-                            <Button Margin="5 0"
-                                    Height="50"
-                                    Width="50"
-                                    Padding="3"
-                                    IsEnabled="{Binding AddOnClickEnabled}">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3"
-                                                       Kind="PlusCircleOutline" />
-                            </Button>
-                            <Button Margin="5 0"
-                                    Height="50"
-                                    Width="50"
-                                    Padding="3"
-                                    IsEnabled="{Binding RemoveOnClickEnabled}">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3"
-                                                       Kind="CloseCircleOutline" />
-                            </Button>
-                            <Button Margin="5 0"
-                                    Padding="3"
-                                    Height="50"
-                                    Width="50"
-                                    IsEnabled="{Binding ConnectOnClickEnabled}">
-                                <StackPanel Orientation="Horizontal"
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Center">
-                                    <avalonia:MaterialIcon Width="25"
-                                                           Height="25"
-                                                           HorizontalAlignment="Left"
-                                                           Kind="TransitConnectionVariant" />
-                                    <TextBlock Margin="5 0"
-                                               VerticalAlignment="Center"
-                                               Text="{Binding SelectedWaypointsCount}" />
-                                </StackPanel>
 
+                            <Button Margin="5 0"
+                                    Height="50"
+                                    Width="50"
+                                    Command="{Binding MoveUpCommand}"
+                                    IsVisible="{Binding Move}"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="MouseMoveUp" />
+                            </Button>
+                            <Button Margin="5 0"
+                                    Height="50"
+                                    Width="50"
+                                    Command="{Binding MoveDownCommand}"
+                                    IsVisible="{Binding Move}"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="MouseMoveDown" />
+                            </Button>
+
+                            <Button Margin="5 0"
+                                    Command="{Binding RotateRightCommand}"
+                                    IsVisible="{Binding Rotate}"
+                                    Height="50"
+                                    Width="50"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="RotateRight" />
+                            </Button>
+                            <Button Margin="5 0"
+                                    IsVisible="{Binding Rotate}"
+                                    Command="{Binding RotateLeftCommand}"
+                                    Height="50"
+                                    Width="50"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="RotateLeft" />
+                            </Button>
+                            
+                            <Button Margin="5 0"
+                                    IsVisible="{Binding Scale}"
+                                    Command="{Binding SizeIncreaseCommand}"
+                                    Height="50"
+                                    Width="50"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="FormatFontSizeIncrease" />
+                            </Button>
+                            <Button Margin="5 0"
+                                    IsVisible="{Binding Scale}"
+                                    Command="{Binding SizeDecreaseCommand}"
+                                    Height="50"
+                                    Width="50"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="FormatFontSizeDecrease" />
+                            </Button>
+                            
+                            <Button Margin="5 0"
+                                    IsVisible="{Binding Display}"
+                                    Command="{Binding FlipHorizontalCommand}"
+                                    Height="50"
+                                    Width="50"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="FlipHorizontal" />
+                            </Button>
+                            <Button Margin="5 0"
+                                    IsVisible="{Binding Display}"
+                                    Command="{Binding FlipVerticalCommand}"
+                                    Height="50"
+                                    Width="50"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="FlipVertical" />
+                            </Button>
+                            
+                            <Button Margin="5 0"
+                                    IsVisible="{Binding Perspective}"
+                                    Command="{Binding ShowPerspectiveCommand}"
+                                    Height="50"
+                                    Width="50"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="CubeOutline" />
                             </Button>
                         </StackPanel>
                     </suki:GlassCard>
@@ -137,7 +210,7 @@
                            Stretch="Uniform"
                            RenderOptions.BitmapInterpolationMode="None"
                            Source="{Binding Bitmap}" />
-                    
+
                     <controls:PixelGridOverlay
                         BitmapWidth="{Binding BitmapWidth}"
                         BitmapHeight="{Binding BitmapHeight}"

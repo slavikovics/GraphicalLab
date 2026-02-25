@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Models;
 using GraphicalLab.Services.DebugControlService;
+using GraphicalLab.Services.FigureLoaderService;
 using GraphicalLab.Services.ToastManagerService;
 
 namespace GraphicalLab.ViewModels;
@@ -14,6 +16,7 @@ public partial class TransformPageViewModel : ViewModelBase
 {
     private readonly IToastManager _toastManager;
     private readonly IDebuggableBitmapControl _debuggableBitmapControl;
+    private readonly IFigureLoader _figureLoader;
 
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
@@ -25,11 +28,6 @@ public partial class TransformPageViewModel : ViewModelBase
     [ObservableProperty] private string _stepsCountText;
     [ObservableProperty] private int _selectedTransformIndex;
 
-    [ObservableProperty] private bool _addOnClickEnabled;
-    [ObservableProperty] private bool _removeOnClickEnabled = true;
-    [ObservableProperty] private bool _connectOnClickEnabled = true;
-    [ObservableProperty] private int _selectedWaypointsCount;
-    
     public bool IsGridVisible
     {
         get;
@@ -50,20 +48,70 @@ public partial class TransformPageViewModel : ViewModelBase
         }
     }
 
-    [ObservableProperty] private List<string> _transformTypes = ["Перемещение", "Поворот", "Скалирование", "Отображение", "Перспектива"];
+    [ObservableProperty] private List<string> _transformTypes =
+        ["Перемещение", "Поворот", "Скалирование", "Отображение", "Перспектива"];
+
+    [ObservableProperty] private bool _move;
+    [ObservableProperty] private bool _rotate;
+    [ObservableProperty] private bool _scale;
+    [ObservableProperty] private bool _display;
+    [ObservableProperty] private bool _perspective;
+
     private delegate void TransformDelegate();
+
     private Dictionary<int, TransformDelegate> _transformsTypesMatch = null!;
 
-    public TransformPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
+    public TransformPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl, IFigureLoader figureLoader)
     {
         _toastManager = toastManager;
         _debuggableBitmapControl = debuggableBitmapControl;
+        _figureLoader = figureLoader;
         _debuggableBitmapControl.WritableBitmapChanged += UpdateImage;
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
+        PropertyChanged += OnPropertyChanged;
         InitializeTransforms();
         InitializeProperties();
     }
-    
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SelectedTransformIndex))
+        {
+            switch (SelectedTransformIndex)
+            {
+                case 0:
+                    DisableSelection();
+                    Move = true;
+                    break;
+                case 1:
+                    DisableSelection();
+                    Rotate = true;
+                    break;
+                case 2:
+                    DisableSelection();
+                    Scale = true;
+                    break;
+                case 3:
+                    DisableSelection();
+                    Display = true;
+                    break;
+                case 4:
+                    DisableSelection();
+                    Perspective = true;
+                    break;
+            }
+        }
+    }
+
+    private void DisableSelection()
+    {
+        Move = false;
+        Rotate = false;
+        Scale = false;
+        Display = false;
+        Perspective = false;
+    }
+
     private void DebuggableBitmapControlOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(_debuggableBitmapControl.IsNextStepAvailable))
@@ -88,6 +136,7 @@ public partial class TransformPageViewModel : ViewModelBase
     {
         IsGridVisible = _debuggableBitmapControl.IsGridVisible;
         SelectedTransformIndex = 0;
+        Move = true;
         IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
         StepsCountText = _debuggableBitmapControl.StepsCountText;
@@ -110,6 +159,60 @@ public partial class TransformPageViewModel : ViewModelBase
 
         _debuggableBitmapControl.ClearBitmap();
         _debuggableBitmapControl.AddPoints(pixels);
+    }
+
+    [RelayCommand]
+    public void MoveUp()
+    {
+        
+    }
+    
+    [RelayCommand]
+    public void MoveDown()
+    {
+        
+    }
+
+    [RelayCommand]
+    public void RotateRight()
+    {
+        
+    }
+    
+    [RelayCommand]
+    public void RotateLeft()
+    {
+        
+    }
+    
+    [RelayCommand]
+    public void SizeIncrease()
+    {
+        
+    }
+    
+    [RelayCommand]
+    public void SizeDecrease()
+    {
+        
+    }
+    
+    [RelayCommand]
+    public void FlipHorizontal()
+    {
+        
+    }
+    
+    [RelayCommand]
+    public void FlipVertical()
+    {
+        
+    }
+    
+    [RelayCommand]
+    public void ShowPerspective()
+    {
+        
     }
 
     [RelayCommand]

@@ -1,4 +1,3 @@
-using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
@@ -6,6 +5,7 @@ using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using GraphicalLab.Services.DebugControlService;
+using GraphicalLab.Services.FigureLoaderService;
 using GraphicalLab.Services.FilePickerService;
 using GraphicalLab.Services.ToastManagerService;
 using GraphicalLab.Services.WritableBitmapProviderService;
@@ -34,6 +34,7 @@ public partial class App : Application
             var window = topLevel;
             return new FilePickerService(window);
         });
+        serviceCollection.AddSingleton<IFigureLoader, FigureLoader>();
         serviceCollection.AddSingleton<TransformPageViewModel>();
         ServiceProvider = serviceCollection?.BuildServiceProvider();
     }
