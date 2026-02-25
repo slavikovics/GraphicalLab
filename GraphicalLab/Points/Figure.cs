@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using GraphicalLab.Lines;
+using GraphicalLab.Models;
 
 namespace GraphicalLab.Points;
 
@@ -11,5 +13,24 @@ public class Figure
     {
         Points = points;
         Lines = lines;
+    }
+
+    public List<Pixel> Draw()
+    {
+        List<Pixel> pixels = [];
+        foreach (var point in Points)
+        {
+            pixels.Add(point.Perspective());
+        }
+
+        foreach (var line in Lines)
+        {
+            var startPoint = line.StartPoint.Perspective();
+            var endPoint = line.EndPoint.Perspective();
+            
+            pixels.AddRange(XiaolinWuLineGenerator.DrawLine(startPoint, endPoint));
+        }
+        
+        return pixels;
     }
 }

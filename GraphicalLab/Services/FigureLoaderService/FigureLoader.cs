@@ -21,11 +21,11 @@ public class FigureLoader : IFigureLoader
         try
         {
             var file = await _filePickerService.PickAsync();
-            var path = file?.Path;
+            var path = file?.Path.AbsolutePath;
 
             if (path != null)
             {
-                var text = await File.ReadAllTextAsync(path.ToString());
+                var text = await File.ReadAllTextAsync(path);
                 var figure = JsonSerializer.Deserialize<Figure>(text);
                 if (figure == null) throw new JsonException();
                 return figure;

@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Models;
+using GraphicalLab.Points;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.FigureLoaderService;
 using GraphicalLab.Services.ToastManagerService;
@@ -17,6 +20,7 @@ public partial class TransformPageViewModel : ViewModelBase
     private readonly IToastManager _toastManager;
     private readonly IDebuggableBitmapControl _debuggableBitmapControl;
     private readonly IFigureLoader _figureLoader;
+    private Figure? _selectedFigure;
 
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
@@ -154,11 +158,25 @@ public partial class TransformPageViewModel : ViewModelBase
 
     private void Redraw()
     {
-        List<Pixel> pixels = [];
-        //foreach (var curve in _curves) pixels.AddRange(curve.Draw());
+        if (_selectedFigure == null) return;
+        List<Pixel> pixels = _selectedFigure.Draw();
 
         _debuggableBitmapControl.ClearBitmap();
         _debuggableBitmapControl.AddPoints(pixels);
+    }
+
+    [RelayCommand]
+    public async Task LoadFigure()
+    {
+        try
+        {
+            _selectedFigure = await _figureLoader.LoadFigure();
+            Redraw();
+        }
+        catch (Exception e)
+        {
+            _toastManager.ShowToast("Ошибка загрузки 3D объекта", e.Message, NotificationType.Error);
+        }
     }
 
     [RelayCommand]

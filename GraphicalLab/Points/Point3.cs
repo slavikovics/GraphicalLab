@@ -1,13 +1,15 @@
 using System;
+using GraphicalLab.Models;
 
 namespace GraphicalLab.Points;
 
 public class Point3
 {
     private const double Tolerance = 0.03;
-    public readonly double X;
-    public readonly double Y;
-    public readonly double Z;
+    private const double K = 20;
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Z { get; set; }
 
     public Point3(double x, double y, double z)
     {
@@ -49,5 +51,13 @@ public class Point3
     public Point4 ToPoint4()
     {
         return new Point4(X, Y, Z, 1);
+    }
+
+    public Pixel Perspective()
+    {
+        var x = X * K / Z;
+        var y = Y * K / Z;
+
+        return new Pixel((int)x, (int)y);
     }
 }

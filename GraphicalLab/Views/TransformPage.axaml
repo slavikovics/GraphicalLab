@@ -33,6 +33,19 @@
                                                    Height="20"
                                                    Margin="3"
                                                    Kind="VectorCurve" />
+
+                            <Button Margin="5 0"
+                                    Height="50"
+                                    Width="50"
+                                    Command="{Binding LoadFigureCommand}"
+                                    IsVisible="{Binding Move}"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="File" />
+                            </Button>
                             <ComboBox SelectedIndex="{Binding SelectedTransformIndex}"
                                       ItemsSource="{Binding TransformTypes}" />
 
@@ -85,7 +98,7 @@
                                                        Margin="3"
                                                        Kind="RotateLeft" />
                             </Button>
-                            
+
                             <Button Margin="5 0"
                                     IsVisible="{Binding Scale}"
                                     Command="{Binding SizeIncreaseCommand}"
@@ -110,7 +123,7 @@
                                                        Margin="3"
                                                        Kind="FormatFontSizeDecrease" />
                             </Button>
-                            
+
                             <Button Margin="5 0"
                                     IsVisible="{Binding Display}"
                                     Command="{Binding FlipHorizontalCommand}"
@@ -135,7 +148,7 @@
                                                        Margin="3"
                                                        Kind="FlipVertical" />
                             </Button>
-                            
+
                             <Button Margin="5 0"
                                     IsVisible="{Binding Perspective}"
                                     Command="{Binding ShowPerspectiveCommand}"
