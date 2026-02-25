@@ -1,9 +1,12 @@
+using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using GraphicalLab.Services.DebugControlService;
+using GraphicalLab.Services.FilePickerService;
 using GraphicalLab.Services.ToastManagerService;
 using GraphicalLab.Services.WritableBitmapProviderService;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +19,8 @@ public partial class App : Application
 {
     private static ServiceProvider? ServiceProvider { get; set; }
 
-    private void RegisterUserServices()
-    {
+    private void RegisterUserServices(Window topLevel)
+    { 
         ServiceCollection serviceCollection = new();
         serviceCollection.AddSingleton<IToastManager, ToastManager>();
         serviceCollection.AddSingleton<IWritableBitmapProvider, WritableBitmapProvider>();
@@ -26,7 +29,13 @@ public partial class App : Application
         serviceCollection.AddSingleton<LinesPageViewModel>();
         serviceCollection.AddSingleton<CirclesPageViewModel>();
         serviceCollection.AddSingleton<CurvesPageViewModel>();
-        ServiceProvider = serviceCollection.BuildServiceProvider();
+        serviceCollection.AddSingleton<IFilePickerService, FilePickerService>(sp =>
+        {
+            var window = topLevel;
+            return new FilePickerService(window);
+        });
+        serviceCollection.AddSingleton<TransformPageViewModel>();
+        ServiceProvider = serviceCollection?.BuildServiceProvider();
     }
 
     public override void Initialize()
@@ -39,14 +48,13 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             DisableAvaloniaDataAnnotationValidation();
-            RegisterUserServices();
+            desktop.MainWindow = new MainWindow();
+            RegisterUserServices(desktop.MainWindow);
             var mainWindowViewModel = ServiceProvider?.GetService<MainWindowViewModel>();
+            
             if (mainWindowViewModel != null)
             {
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = mainWindowViewModel
-                };
+                desktop.MainWindow.DataContext = mainWindowViewModel;
             }
         }
 

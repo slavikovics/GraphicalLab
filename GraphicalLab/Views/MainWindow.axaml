@@ -78,6 +78,21 @@
                 </suki:SukiSideMenuItem.PageContent>
             </suki:SukiSideMenuItem>
             
+            <!-- Transform Page -->
+            
+            <suki:SukiSideMenuItem Header="Преобразования">
+                <suki:SukiSideMenuItem.Icon>
+                    <avalonia:MaterialIcon Width="20"
+                                           Height="20"
+                                           VerticalAlignment="Center"
+                                           Foreground="White"
+                                           Kind="Rotate3d" />
+                </suki:SukiSideMenuItem.Icon>
+                <suki:SukiSideMenuItem.PageContent>
+                    <ContentControl Content="{Binding TransformPageViewModel}"/>
+                </suki:SukiSideMenuItem.PageContent>
+            </suki:SukiSideMenuItem>
+            
         </suki:SukiSideMenu.Items>
     </suki:SukiSideMenu>
 </suki:SukiWindow>

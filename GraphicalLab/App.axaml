@@ -27,6 +27,9 @@
         <DataTemplate DataType="vm:CurvesPageViewModel">
             <views:CurvesPage/>
         </DataTemplate>
+        <DataTemplate DataType="vm:TransformPageViewModel">
+            <views:TransformPage/>
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>

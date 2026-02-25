@@ -42,5 +42,9 @@
         <DependentUpon>CurvesPage.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Views\TransformPage.axaml.cs">
+        <DependentUpon>TransformPage.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>
