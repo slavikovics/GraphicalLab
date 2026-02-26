@@ -14,6 +14,7 @@ public interface IDebuggableBitmapControl : INotifyPropertyChanged, INotifyPrope
     bool IsNextStepAvailable { get; }
     event Action WritableBitmapChanged;
     void AddPoints(List<Pixel> points);
+    void AddPointsToCenter(List<Pixel> points);
     void ClearBitmap();
     void HandleDebugNextStep();
     void SetPixel(Pixel pixel);

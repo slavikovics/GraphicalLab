@@ -1,4 +1,6 @@
-﻿using GraphicalLab.Services.ToastManagerService;
+﻿using Avalonia.Input;
+using CommunityToolkit.Mvvm.Input;
+using GraphicalLab.Services.ToastManagerService;
 using SukiUI.Toasts;
 
 namespace GraphicalLab.ViewModels;
@@ -24,5 +26,11 @@ public partial class MainWindowViewModel : ViewModelBase
         CirclesPageViewModel = circlesPageViewModel;
         CurvesPageViewModel = curvesPageViewModel;
         TransformPageViewModel = transformPageViewModel;
+    }
+
+    [RelayCommand]
+    public void HandleKeyDownCommand(KeyEventArgs e)
+    {
+        TransformPageViewModel?.HandleKeyDownCommand.Execute(e);
     }
 }

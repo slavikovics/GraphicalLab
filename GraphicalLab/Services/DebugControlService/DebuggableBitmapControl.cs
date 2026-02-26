@@ -63,6 +63,17 @@ public partial class DebuggableBitmapControl : ObservableObject, IDebuggableBitm
         }
     }
 
+    public void AddPointsToCenter(List<Pixel> points)
+    {
+        foreach (var point in points)
+        {
+            point.X += GetBitmapWidth() / 2;
+            point.Y += GetBitmapHeight() / 2;
+        }
+        
+        AddPoints(points);
+    }
+
     public void ClearBitmap()
     {
         PointsToDraw.Clear();

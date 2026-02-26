@@ -76,7 +76,7 @@
 
                             <Button Margin="5 0"
                                     Command="{Binding RotateRightCommand}"
-                                    IsVisible="{Binding Rotate}"
+                                    IsVisible="{Binding Rotated}"
                                     Height="50"
                                     Width="50"
                                     Padding="3">
@@ -87,7 +87,7 @@
                                                        Kind="RotateRight" />
                             </Button>
                             <Button Margin="5 0"
-                                    IsVisible="{Binding Rotate}"
+                                    IsVisible="{Binding Rotated}"
                                     Command="{Binding RotateLeftCommand}"
                                     Height="50"
                                     Width="50"

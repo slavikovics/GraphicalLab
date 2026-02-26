@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GraphicalLab.Lines;
 using GraphicalLab.Models;
@@ -15,22 +16,53 @@ public class Figure
         Lines = lines;
     }
 
+    public Figure()
+    {
+        Points = [];
+        Lines = [];
+    }
+
+    public Figure(List<Point3> points, int pointsCount, int linesCount)
+    {
+        var totalCount = pointsCount + linesCount * 2;
+        if (points.Count != totalCount)
+        {
+            throw new ArgumentException("Points count must be equal to points count + linesCount * 2");
+        }
+
+        Points = [];
+        Lines = [];
+
+        for (int i = 0; i < pointsCount; i++)
+        {
+            Points.Add(points[i]);
+        }
+
+        for (int i = pointsCount; i < totalCount - 1; i += 2)
+        {
+            Lines.Add(new Line(points[i], points[i + 1]));
+        }
+    }
+
     public List<Pixel> Draw()
     {
         List<Pixel> pixels = [];
+
+
         foreach (var point in Points)
         {
             pixels.Add(point.Perspective());
         }
 
+
         foreach (var line in Lines)
         {
             var startPoint = line.StartPoint.Perspective();
             var endPoint = line.EndPoint.Perspective();
-            
+
             pixels.AddRange(XiaolinWuLineGenerator.DrawLine(startPoint, endPoint));
         }
-        
+
         return pixels;
     }
 }

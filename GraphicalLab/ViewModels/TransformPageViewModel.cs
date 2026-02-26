@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
+using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,6 +13,7 @@ using GraphicalLab.Points;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.FigureLoaderService;
 using GraphicalLab.Services.ToastManagerService;
+using GraphicalLab.Transform;
 
 namespace GraphicalLab.ViewModels;
 
@@ -20,8 +22,10 @@ public partial class TransformPageViewModel : ViewModelBase
     private readonly IToastManager _toastManager;
     private readonly IDebuggableBitmapControl _debuggableBitmapControl;
     private readonly IFigureLoader _figureLoader;
-    private Figure? _selectedFigure;
-
+    private readonly Rotate _rotate;
+    private Figure? _loadedFigure;
+    private Figure? _transformedFigure;
+    
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
     public WriteableBitmap Bitmap => _debuggableBitmapControl.GetBitmap();
@@ -56,7 +60,7 @@ public partial class TransformPageViewModel : ViewModelBase
         ["Перемещение", "Поворот", "Скалирование", "Отображение", "Перспектива"];
 
     [ObservableProperty] private bool _move;
-    [ObservableProperty] private bool _rotate;
+    [ObservableProperty] private bool _rotated;
     [ObservableProperty] private bool _scale;
     [ObservableProperty] private bool _display;
     [ObservableProperty] private bool _perspective;
@@ -65,14 +69,17 @@ public partial class TransformPageViewModel : ViewModelBase
 
     private Dictionary<int, TransformDelegate> _transformsTypesMatch = null!;
 
-    public TransformPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl, IFigureLoader figureLoader)
+    public TransformPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl, IFigureLoader figureLoader, Rotate rotate)
     {
         _toastManager = toastManager;
         _debuggableBitmapControl = debuggableBitmapControl;
         _figureLoader = figureLoader;
+        _rotate = rotate;
+        
         _debuggableBitmapControl.WritableBitmapChanged += UpdateImage;
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
         PropertyChanged += OnPropertyChanged;
+        
         InitializeTransforms();
         InitializeProperties();
     }
@@ -89,7 +96,7 @@ public partial class TransformPageViewModel : ViewModelBase
                     break;
                 case 1:
                     DisableSelection();
-                    Rotate = true;
+                    Rotated = true;
                     break;
                 case 2:
                     DisableSelection();
@@ -110,7 +117,7 @@ public partial class TransformPageViewModel : ViewModelBase
     private void DisableSelection()
     {
         Move = false;
-        Rotate = false;
+        Rotated = false;
         Scale = false;
         Display = false;
         Perspective = false;
@@ -158,25 +165,26 @@ public partial class TransformPageViewModel : ViewModelBase
 
     private void Redraw()
     {
-        if (_selectedFigure == null) return;
-        List<Pixel> pixels = _selectedFigure.Draw();
+        if (_loadedFigure == null) return;
+        List<Pixel> pixels = _loadedFigure.Draw();
 
         _debuggableBitmapControl.ClearBitmap();
-        _debuggableBitmapControl.AddPoints(pixels);
+        _debuggableBitmapControl.AddPointsToCenter(pixels);
     }
 
     [RelayCommand]
     public async Task LoadFigure()
     {
-        try
-        {
-            _selectedFigure = await _figureLoader.LoadFigure();
+        // try
+        // {
+            _loadedFigure = await _figureLoader.LoadFigure();
+            _transformedFigure = _rotate.RotateFigure(_loadedFigure, 2, RotationDirection.X);
             Redraw();
-        }
-        catch (Exception e)
-        {
-            _toastManager.ShowToast("Ошибка загрузки 3D объекта", e.Message, NotificationType.Error);
-        }
+        // }
+        // catch (Exception e)
+        // {
+        //     _toastManager.ShowToast("Ошибка загрузки 3D объекта", e.Message, NotificationType.Error);
+        // }
     }
 
     [RelayCommand]
@@ -243,5 +251,41 @@ public partial class TransformPageViewModel : ViewModelBase
     private void HandleDebugNextStep()
     {
         _debuggableBitmapControl.HandleDebugNextStep();
+    }
+
+    [RelayCommand]
+    private void HandleKeyDown(KeyEventArgs e)
+    {
+        if (_loadedFigure == null) return;
+        if (e.Key == Key.A)
+        {
+            _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, RotationDirection.X);
+            Redraw();
+        }
+        else if (e.Key == Key.D)
+        {
+            _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, RotationDirection.X);
+            Redraw();
+        }
+        else if (e.Key == Key.W)
+        {
+            _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, RotationDirection.Y);
+            Redraw();
+        }
+        else if (e.Key == Key.S)
+        {
+            _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, RotationDirection.Y);
+            Redraw();
+        }
+        else if (e.Key == Key.Q)
+        {
+            _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, RotationDirection.Z);
+            Redraw();
+        }
+        else if (e.Key == Key.E)
+        {
+            _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, RotationDirection.Z);
+            Redraw();
+        }
     }
 }

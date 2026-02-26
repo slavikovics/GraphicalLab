@@ -1,4 +1,5 @@
 using System;
+using GraphicalLab.Matrix;
 using GraphicalLab.Models;
 
 namespace GraphicalLab.Points;
@@ -42,22 +43,29 @@ public class Point3
         if (obj.GetType() != GetType()) return false;
         return Equals((Point3)obj);
     }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(X, Y, Z);
-    }
-
+    
     public Point4 ToPoint4()
     {
         return new Point4(X, Y, Z, 1);
     }
 
+    public Matrix<double> ToVector()
+    {
+        var matrix = new Matrix<double>(4, 1);
+        matrix.SetValue(0, 0, X);
+        matrix.SetValue(1, 0, Y);
+        matrix.SetValue(2, 0, Z);
+        matrix.SetValue(3, 0, 1);
+        return matrix;
+    }
+
     public Pixel Perspective()
     {
+        if (Z == 0) return new Pixel((int)X, (int)Y);
+        
         var x = X * K / Z;
         var y = Y * K / Z;
 
-        return new Pixel((int)x, (int)y);
+        return new Pixel((int)Math.Round(x), (int)Math.Round(y));
     }
 }

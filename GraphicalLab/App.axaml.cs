@@ -9,6 +9,7 @@ using GraphicalLab.Services.FigureLoaderService;
 using GraphicalLab.Services.FilePickerService;
 using GraphicalLab.Services.ToastManagerService;
 using GraphicalLab.Services.WritableBitmapProviderService;
+using GraphicalLab.Transform;
 using Microsoft.Extensions.DependencyInjection;
 using GraphicalLab.ViewModels;
 using GraphicalLab.Views;
@@ -29,6 +30,8 @@ public partial class App : Application
         serviceCollection.AddSingleton<LinesPageViewModel>();
         serviceCollection.AddSingleton<CirclesPageViewModel>();
         serviceCollection.AddSingleton<CurvesPageViewModel>();
+        serviceCollection.AddSingleton<Rotate>();
+        serviceCollection.AddSingleton<Move>();
         serviceCollection.AddSingleton<IFilePickerService, FilePickerService>(sp =>
         {
             var window = topLevel;
