@@ -4,9 +4,11 @@ using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using GraphicalLab.Services;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.FigureLoaderService;
 using GraphicalLab.Services.FilePickerService;
+using GraphicalLab.Services.ObjToFigureConverter;
 using GraphicalLab.Services.ToastManagerService;
 using GraphicalLab.Services.WritableBitmapProviderService;
 using GraphicalLab.Transform;
@@ -30,6 +32,7 @@ public partial class App : Application
         serviceCollection.AddSingleton<LinesPageViewModel>();
         serviceCollection.AddSingleton<CirclesPageViewModel>();
         serviceCollection.AddSingleton<CurvesPageViewModel>();
+        serviceCollection.AddSingleton<IObjToFigureConverter, ObjToFigureConverter>();
         serviceCollection.AddSingleton<Rotate>();
         serviceCollection.AddSingleton<Move>();
         serviceCollection.AddSingleton<IFilePickerService, FilePickerService>(sp =>

@@ -175,16 +175,16 @@ public partial class TransformPageViewModel : ViewModelBase
     [RelayCommand]
     public async Task LoadFigure()
     {
-        // try
-        // {
+        try
+        {
             _loadedFigure = await _figureLoader.LoadFigure();
             _transformedFigure = _rotate.RotateFigure(_loadedFigure, 2, RotationDirection.X);
             Redraw();
-        // }
-        // catch (Exception e)
-        // {
-        //     _toastManager.ShowToast("Ошибка загрузки 3D объекта", e.Message, NotificationType.Error);
-        // }
+        }
+        catch (Exception e)
+        {
+            _toastManager.ShowToast("Ошибка загрузки 3D объекта", e.Message, NotificationType.Error);
+        }
     }
 
     [RelayCommand]
@@ -257,22 +257,22 @@ public partial class TransformPageViewModel : ViewModelBase
     private void HandleKeyDown(KeyEventArgs e)
     {
         if (_loadedFigure == null) return;
-        if (e.Key == Key.A)
+        if (e.Key == Key.W)
         {
             _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, RotationDirection.X);
             Redraw();
         }
-        else if (e.Key == Key.D)
+        else if (e.Key == Key.S)
         {
             _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, RotationDirection.X);
             Redraw();
         }
-        else if (e.Key == Key.W)
+        else if (e.Key == Key.A)
         {
             _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, RotationDirection.Y);
             Redraw();
         }
-        else if (e.Key == Key.S)
+        else if (e.Key == Key.D)
         {
             _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, RotationDirection.Y);
             Redraw();
