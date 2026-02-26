@@ -51,14 +51,14 @@ public class Figure
 
         foreach (var point in Points)
         {
-            pixels.Add(point.Perspective());
+            pixels.Add(point.Ortagonal());
         }
 
 
         foreach (var line in Lines)
         {
-            var startPoint = line.StartPoint.Perspective();
-            var endPoint = line.EndPoint.Perspective();
+            var startPoint = line.StartPoint.Ortagonal();
+            var endPoint = line.EndPoint.Ortagonal();
 
             pixels.AddRange(XiaolinWuLineGenerator.DrawLine(startPoint, endPoint));
         }

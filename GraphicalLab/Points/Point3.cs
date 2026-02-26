@@ -68,4 +68,9 @@ public class Point3
 
         return new Pixel((int)Math.Round(x), (int)Math.Round(y));
     }
+
+    public Pixel Ortagonal()
+    {
+        return new Pixel((int)Math.Round(X), (int)Math.Round(Y));
+    }
 }
