@@ -4,7 +4,6 @@ using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using GraphicalLab.Services;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.FigureLoaderService;
 using GraphicalLab.Services.FilePickerService;

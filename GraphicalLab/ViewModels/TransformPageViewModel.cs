@@ -8,7 +8,6 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GraphicalLab.Models;
 using GraphicalLab.Points;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.FigureLoaderService;
@@ -75,7 +74,8 @@ public partial class TransformPageViewModel : ViewModelBase
     private Dictionary<int, TransformDelegate> _transformsTypesMatch = null!;
 
     public TransformPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl,
-        IFigureLoader figureLoader, Rotate rotate, Move movement, Scale scaler, Perspective perspective, Reflection reflection)
+        IFigureLoader figureLoader, Rotate rotate, Move movement, Scale scaler, Perspective perspective,
+        Reflection reflection)
     {
         _toastManager = toastManager;
         _debuggableBitmapControl = debuggableBitmapControl;
@@ -342,43 +342,12 @@ public partial class TransformPageViewModel : ViewModelBase
             _loadedFigure = _scaler.ScaleFigure(_loadedFigure, 0.9);
             Redraw();
         }
-        else if (e.Key == Key.X)
-        {
-            _loadedFigure = _scaler.ScaleFigureX(_loadedFigure, 1.2);
-            Redraw();
-        }
-        else if (e.Key == Key.Y)
-        {
-            _loadedFigure = _scaler.ScaleFigureY(_loadedFigure, 1.2);
-            Redraw();
-        }
-        else if (e.Key == Key.Z)
-        {
-            _loadedFigure = _scaler.ScaleFigureZ(_loadedFigure, 1.2);
-            Redraw();
-        }
-        else if (e.Key == Key.C)
-        {
-            _loadedFigure = _scaler.ScaleFigure(_loadedFigure, 1.0);
-            Redraw();
-        }
     }
 
-    private void HandlePerspective(KeyEventArgs e)
-    {
-        if (_loadedFigure == null) return;
-
-        if (e.Key == Key.P)
-        {
-            _loadedFigure = _perspectiveProjection.ApplyPerspective(_loadedFigure);
-            Redraw();
-        }
-    }
-    
     private void HandleReflection(KeyEventArgs e)
     {
         if (_loadedFigure == null) return;
-    
+
         if (e.Key == Key.F)
         {
             _loadedFigure = _reflection.ReflectX(_loadedFigure);
@@ -396,15 +365,35 @@ public partial class TransformPageViewModel : ViewModelBase
         }
     }
 
+    private void HandleKeys(KeyEventArgs e)
+    {
+    }
+
     [RelayCommand]
     private void HandleKeyDown(KeyEventArgs e)
     {
-        switch (SelectedTransformIndex)
+        if (_loadedFigure == null) return;
+        switch (e.Key)
         {
-            case 0: HandleMove(e); break;
-            case 1: HandleRotate(e); break;
-            case 2: HandleScale(e); break;
-            case 3: HandleReflection(e); break;
+            case Key.W: _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.X); break;
+            case Key.S: _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, Direction.X); break;
+            case Key.A: _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.Y); break;
+            case Key.D: _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, Direction.Y); break;
+            case Key.Q: _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.Z); break;
+            case Key.E: _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, Direction.Z); break;
+            case Key.F1: _loadedFigure = _reflection.ReflectX(_loadedFigure); break;
+            case Key.F2: _loadedFigure = _reflection.ReflectY(_loadedFigure); break;
+            case Key.F3: _loadedFigure = _reflection.ReflectZ(_loadedFigure); break;
+            case Key.OemPlus: _loadedFigure = _scaler.ScaleFigure(_loadedFigure, 1.1); break;
+            case Key.OemMinus: _loadedFigure = _scaler.ScaleFigure(_loadedFigure, 0.9); break;
+            case Key.Left: _loadedFigure = _movement.MoveFigure(_loadedFigure, -1, 0, 0); break;
+            case Key.Right: _loadedFigure = _movement.MoveFigure(_loadedFigure, 1, 0, 0); break;
+            case Key.Up: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, -1, 0); break;
+            case Key.Down: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 1, 0); break;
+            case Key.PageUp: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 0, 1); break;
+            case Key.PageDown: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 0, -1); break;
         }
+
+        Redraw();
     }
 }

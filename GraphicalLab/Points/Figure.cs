@@ -60,7 +60,7 @@ public class Figure
             var startPoint = line.StartPoint.Ortagonal();
             var endPoint = line.EndPoint.Ortagonal();
 
-            pixels.AddRange(XiaolinWuLineGenerator.DrawLine(startPoint, endPoint));
+            pixels.AddRange(BrezenhemLineGenerator.DrawLine(startPoint, endPoint));
         }
 
         return pixels;

@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using GraphicalLab.Matrix;
+﻿using System.Collections.Generic;
 using GraphicalLab.Points;
 
 namespace GraphicalLab.Transform;
 
 public class Perspective
 {
-    private double _cameraDistance; // Расстояние от камеры до центра сцены
-    private double _focalLength;    // Фокусное расстояние (аналог K)
+    private double _cameraDistance;
+    private double _focalLength;
 
-    public Perspective(double cameraDistance = 500, double focalLength = 200)
+    public Perspective(double cameraDistance = 100, double focalLength = 40)
     {
         _cameraDistance = cameraDistance;
         _focalLength = focalLength;
@@ -18,20 +16,15 @@ public class Perspective
 
     public Point3 ProjectPoint(Point3 point)
     {
-        // Координата Z относительно камеры
-        // Камера смотрит на центр сцены (0,0,0) с расстояния _cameraDistance
         double zRelative = _cameraDistance - point.Z;
-        
-        // Защита от слишком маленького Z
         if (zRelative < 10) zRelative = 10;
         
-        // Перспективная проекция
         double scale = _focalLength / zRelative;
         
         return new Point3(
             point.X * scale,
             point.Y * scale,
-            point.Z // Сохраняем Z для других преобразований
+            point.Z
         );
     }
 

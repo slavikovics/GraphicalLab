@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using GraphicalLab.Matrix;
 using GraphicalLab.Points;
 
@@ -48,37 +47,22 @@ public class Reflection
     public Figure ReflectX(Figure initial)
     {
         ResetToIdentity();
-        _reflectionMatrix.SetValue(0, 0, -1); // X -> -X
+        _reflectionMatrix.SetValue(0, 0, -1);
         return ApplyReflection(initial);
     }
 
     public Figure ReflectY(Figure initial)
     {
         ResetToIdentity();
-        _reflectionMatrix.SetValue(1, 1, -1); // Y -> -Y
+        _reflectionMatrix.SetValue(1, 1, -1);
         return ApplyReflection(initial);
     }
 
     public Figure ReflectZ(Figure initial)
     {
         ResetToIdentity();
-        _reflectionMatrix.SetValue(2, 2, -1); // Z -> -Z
+        _reflectionMatrix.SetValue(2, 2, -1);
         return ApplyReflection(initial);
-    }
-
-    public Figure ReflectXY(Figure initial) // Отражение относительно плоскости XY (Z)
-    {
-        return ReflectZ(initial);
-    }
-
-    public Figure ReflectXZ(Figure initial) // Отражение относительно плоскости XZ (Y)
-    {
-        return ReflectY(initial);
-    }
-
-    public Figure ReflectYZ(Figure initial) // Отражение относительно плоскости YZ (X)
-    {
-        return ReflectX(initial);
     }
 
     private Figure ApplyReflection(Figure initial)
