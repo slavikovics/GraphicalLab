@@ -148,19 +148,17 @@
                                                        Margin="3"
                                                        Kind="FlipVertical" />
                             </Button>
-
-                            <Button Margin="5 0"
-                                    IsVisible="{Binding Perspective}"
-                                    Command="{Binding ShowPerspectiveCommand}"
-                                    Height="50"
-                                    Width="50"
-                                    Padding="3">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3"
-                                                       Kind="CubeOutline" />
-                            </Button>
+                            
+                            <avalonia:MaterialIcon Width="25"
+                                                   HorizontalAlignment="Center"
+                                                   IsVisible="{Binding PerspectiveVisible}"
+                                                   Height="25"
+                                                   Margin="3"
+                                                   Kind="CubeOutline" />
+                            <ToggleSwitch Margin="5 0"
+                                          IsVisible="{Binding PerspectiveVisible}"
+                                          IsChecked="{Binding Perspective}">
+                            </ToggleSwitch>
                         </StackPanel>
                     </suki:GlassCard>
                 </Border>

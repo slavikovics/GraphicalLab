@@ -68,6 +68,7 @@ public partial class TransformPageViewModel : ViewModelBase
     [ObservableProperty] private bool _scale;
     [ObservableProperty] private bool _display;
     [ObservableProperty] private bool _perspective;
+    [ObservableProperty] private bool _perspectiveVisible;
 
     private delegate void TransformDelegate();
 
@@ -118,9 +119,13 @@ public partial class TransformPageViewModel : ViewModelBase
                     break;
                 case 4:
                     DisableSelection();
-                    Perspective = true;
+                    PerspectiveVisible = true;
                     break;
             }
+        }
+        else if (e.PropertyName == nameof(Perspective))
+        {
+            Redraw();
         }
     }
 
@@ -130,7 +135,7 @@ public partial class TransformPageViewModel : ViewModelBase
         Rotated = false;
         Scale = false;
         Display = false;
-        Perspective = false;
+        PerspectiveVisible = false;
     }
 
     private void DebuggableBitmapControlOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -176,10 +181,7 @@ public partial class TransformPageViewModel : ViewModelBase
     private void Redraw()
     {
         if (_loadedFigure == null) return;
-        //List<Pixel> pixels = _loadedFigure.Draw();
-        List<Pixel> pixels = _perspectiveProjection.ApplyPerspective(_loadedFigure).Draw();
-
-
+        var pixels = Perspective ? _perspectiveProjection.ApplyPerspective(_loadedFigure).Draw() : _loadedFigure.Draw();
         _debuggableBitmapControl.ClearBitmap();
         _debuggableBitmapControl.AddPointsToCenter(pixels);
     }
@@ -403,7 +405,6 @@ public partial class TransformPageViewModel : ViewModelBase
             case 1: HandleRotate(e); break;
             case 2: HandleScale(e); break;
             case 3: HandleReflection(e); break;
-            case 4: HandlePerspective(e); break;
         }
     }
 }
