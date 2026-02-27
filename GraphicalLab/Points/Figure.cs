@@ -51,7 +51,7 @@ public class Figure
 
         foreach (var point in Points)
         {
-            pixels.Add(point.Ortagonal());
+            pixels.Add(point.Perspective());
         }
 
 

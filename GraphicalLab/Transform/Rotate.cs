@@ -93,7 +93,7 @@ public class Rotate
         return result;
     }
 
-    public Figure RotateFigure(Figure initial, double angle, RotationDirection direction)
+    public Figure RotateFigure(Figure initial, double angle, Direction direction)
     {
         var pointsCount = initial.Points.Count;
         var linesCount = initial.Lines.Count;
@@ -110,15 +110,15 @@ public class Rotate
 
         switch (direction)
         {
-            case RotationDirection.X:
+            case Direction.X:
                 newPoints = RotateX(collectedPoints, angle);
                 break;
 
-            case RotationDirection.Y:
+            case Direction.Y:
                 newPoints = RotateY(collectedPoints, angle);
                 break;
 
-            case RotationDirection.Z:
+            case Direction.Z:
                 newPoints = RotateZ(collectedPoints, angle);
                 break;
 

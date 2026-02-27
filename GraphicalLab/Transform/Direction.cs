@@ -1,6 +1,6 @@
 ﻿namespace GraphicalLab.Transform;
 
-public enum RotationDirection
+public enum Direction
 {
     X,
     Y,

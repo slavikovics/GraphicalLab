@@ -35,6 +35,9 @@ public partial class App : Application
         serviceCollection.AddSingleton<IObjToFigureConverter, ObjToFigureConverter>();
         serviceCollection.AddSingleton<Rotate>();
         serviceCollection.AddSingleton<Move>();
+        serviceCollection.AddSingleton<Scale>();
+        serviceCollection.AddSingleton<Perspective>();
+        serviceCollection.AddSingleton<Reflection>();
         serviceCollection.AddSingleton<IFilePickerService, FilePickerService>(sp =>
         {
             var window = topLevel;

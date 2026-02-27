@@ -7,7 +7,7 @@ namespace GraphicalLab.Points;
 public class Point3
 {
     private const double Tolerance = 0.03;
-    private const double K = 20;
+    private const double K = 50;
     public double X { get; set; }
     public double Y { get; set; }
     public double Z { get; set; }
