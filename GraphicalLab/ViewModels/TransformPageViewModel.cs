@@ -27,7 +27,6 @@ public partial class TransformPageViewModel : ViewModelBase
     private readonly Reflection _reflection;
     private readonly Perspective _perspectiveProjection;
     private Figure? _loadedFigure;
-    private Figure? _transformedFigure;
 
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
@@ -35,9 +34,17 @@ public partial class TransformPageViewModel : ViewModelBase
 
     public Image? TargetImage = null;
 
+    [ObservableProperty] private List<string> _transformTypes =
+        ["Перемещение", "Поворот", "Скалирование", "Отображение", "Перспектива"];
     [ObservableProperty] private bool _isNextStepAvailable;
     [ObservableProperty] private string _stepsCountText;
     [ObservableProperty] private int _selectedTransformIndex;
+    [ObservableProperty] private bool _move;
+    [ObservableProperty] private bool _rotated;
+    [ObservableProperty] private bool _scale;
+    [ObservableProperty] private bool _display;
+    [ObservableProperty] private bool _perspective;
+    [ObservableProperty] private bool _perspectiveVisible;
 
     public bool IsGridVisible
     {
@@ -59,20 +66,6 @@ public partial class TransformPageViewModel : ViewModelBase
         }
     }
 
-    [ObservableProperty] private List<string> _transformTypes =
-        ["Перемещение", "Поворот", "Скалирование", "Отображение", "Перспектива"];
-
-    [ObservableProperty] private bool _move;
-    [ObservableProperty] private bool _rotated;
-    [ObservableProperty] private bool _scale;
-    [ObservableProperty] private bool _display;
-    [ObservableProperty] private bool _perspective;
-    [ObservableProperty] private bool _perspectiveVisible;
-
-    private delegate void TransformDelegate();
-
-    private Dictionary<int, TransformDelegate> _transformsTypesMatch = null!;
-
     public TransformPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl,
         IFigureLoader figureLoader, Rotate rotate, Move movement, Scale scaler, Perspective perspective,
         Reflection reflection)
@@ -91,8 +84,17 @@ public partial class TransformPageViewModel : ViewModelBase
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
         PropertyChanged += OnPropertyChanged;
 
-        InitializeTransforms();
         InitializeProperties();
+    }
+    
+    private void InitializeProperties()
+    {
+        IsGridVisible = _debuggableBitmapControl.IsGridVisible;
+        SelectedTransformIndex = 0;
+        Move = true;
+        IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
+        IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
+        StepsCountText = _debuggableBitmapControl.StepsCountText;
     }
 
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -158,21 +160,6 @@ public partial class TransformPageViewModel : ViewModelBase
         }
     }
 
-    private void InitializeProperties()
-    {
-        IsGridVisible = _debuggableBitmapControl.IsGridVisible;
-        SelectedTransformIndex = 0;
-        Move = true;
-        IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
-        IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
-        StepsCountText = _debuggableBitmapControl.StepsCountText;
-    }
-
-    private void InitializeTransforms()
-    {
-        _transformsTypesMatch = new Dictionary<int, TransformDelegate>();
-    }
-
     private void UpdateImage()
     {
         TargetImage?.InvalidateVisual();
@@ -192,7 +179,6 @@ public partial class TransformPageViewModel : ViewModelBase
         try
         {
             _loadedFigure = await _figureLoader.LoadFigure();
-            _transformedFigure = _rotate.RotateFigure(_loadedFigure, 2, Direction.X);
             Redraw();
         }
         catch (Exception e)
@@ -204,169 +190,102 @@ public partial class TransformPageViewModel : ViewModelBase
     [RelayCommand]
     public void MoveUp()
     {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, -1, 0);
+        Redraw();
     }
 
     [RelayCommand]
     public void MoveDown()
     {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 1, 0);
+        Redraw();
+    }
+    
+    [RelayCommand]
+    public void MoveLeft()
+    {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _movement.MoveFigure(_loadedFigure, -1, 0, 0);
+        Redraw();
     }
 
     [RelayCommand]
-    public void RotateRight()
+    public void MoveRight()
     {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _movement.MoveFigure(_loadedFigure, 1, 0, 0);
+        Redraw();
     }
 
     [RelayCommand]
-    public void RotateLeft()
+    public void RotateX()
     {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.X);
+        Redraw();
     }
 
+    [RelayCommand]
+    public void RotateY()
+    {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.Y);
+        Redraw();
+    }
+
+    [RelayCommand]
+    public void RotateZ()
+    {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.Z);
+        Redraw();
+    }
+    
     [RelayCommand]
     public void SizeIncrease()
     {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _scaler.ScaleFigure(_loadedFigure, 1.1);
+        Redraw();
     }
 
     [RelayCommand]
     public void SizeDecrease()
     {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _scaler.ScaleFigure(_loadedFigure, 0.9);
+        Redraw();
     }
 
     [RelayCommand]
     public void FlipHorizontal()
     {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _reflection.ReflectX(_loadedFigure);
+        Redraw();
     }
 
     [RelayCommand]
     public void FlipVertical()
     {
-    }
-
-    [RelayCommand]
-    public void ShowPerspective()
-    {
+        if (_loadedFigure is null) return;
+        _loadedFigure = _reflection.ReflectY(_loadedFigure);
+        Redraw();
     }
 
     [RelayCommand]
     public void ClearBitmap()
     {
         _debuggableBitmapControl.ClearBitmap();
+        _loadedFigure = null;
     }
 
     [RelayCommand]
     private void HandleDebugNextStep()
     {
         _debuggableBitmapControl.HandleDebugNextStep();
-    }
-
-    private void HandleRotate(KeyEventArgs e)
-    {
-        if (_loadedFigure == null) return;
-        if (e.Key == Key.W)
-        {
-            _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.X);
-            Redraw();
-        }
-        else if (e.Key == Key.S)
-        {
-            _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, Direction.X);
-            Redraw();
-        }
-        else if (e.Key == Key.A)
-        {
-            _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.Y);
-            Redraw();
-        }
-        else if (e.Key == Key.D)
-        {
-            _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, Direction.Y);
-            Redraw();
-        }
-        else if (e.Key == Key.Q)
-        {
-            _loadedFigure = _rotate.RotateFigure(_loadedFigure, 0.1, Direction.Z);
-            Redraw();
-        }
-        else if (e.Key == Key.E)
-        {
-            _loadedFigure = _rotate.RotateFigure(_loadedFigure, -0.1, Direction.Z);
-            Redraw();
-        }
-    }
-
-    private void HandleMove(KeyEventArgs e)
-    {
-        if (_loadedFigure == null) return;
-        if (e.Key == Key.W)
-        {
-            _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, -1, 0);
-            Redraw();
-        }
-        else if (e.Key == Key.S)
-        {
-            _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 1, 0);
-            Redraw();
-        }
-        else if (e.Key == Key.A)
-        {
-            _loadedFigure = _movement.MoveFigure(_loadedFigure, -1, 0, 0);
-            Redraw();
-        }
-        else if (e.Key == Key.D)
-        {
-            _loadedFigure = _movement.MoveFigure(_loadedFigure, 1, 0, 0);
-            Redraw();
-        }
-        else if (e.Key == Key.Q)
-        {
-            _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 0, 1);
-            Redraw();
-        }
-        else if (e.Key == Key.E)
-        {
-            _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 0, -1);
-            Redraw();
-        }
-    }
-
-    private void HandleScale(KeyEventArgs e)
-    {
-        if (_loadedFigure == null) return;
-
-        if (e.Key == Key.OemPlus)
-        {
-            _loadedFigure = _scaler.ScaleFigure(_loadedFigure, 1.1);
-            Redraw();
-        }
-        else if (e.Key == Key.OemMinus)
-        {
-            _loadedFigure = _scaler.ScaleFigure(_loadedFigure, 0.9);
-            Redraw();
-        }
-    }
-
-    private void HandleReflection(KeyEventArgs e)
-    {
-        if (_loadedFigure == null) return;
-
-        if (e.Key == Key.F)
-        {
-            _loadedFigure = _reflection.ReflectX(_loadedFigure);
-            Redraw();
-        }
-        else if (e.Key == Key.G)
-        {
-            _loadedFigure = _reflection.ReflectY(_loadedFigure);
-            Redraw();
-        }
-        else if (e.Key == Key.H)
-        {
-            _loadedFigure = _reflection.ReflectZ(_loadedFigure);
-            Redraw();
-        }
-    }
-
-    private void HandleKeys(KeyEventArgs e)
-    {
     }
 
     [RelayCommand]
@@ -390,8 +309,9 @@ public partial class TransformPageViewModel : ViewModelBase
             case Key.Right: _loadedFigure = _movement.MoveFigure(_loadedFigure, 1, 0, 0); break;
             case Key.Up: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, -1, 0); break;
             case Key.Down: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 1, 0); break;
-            case Key.PageUp: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 0, 1); break;
-            case Key.PageDown: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 0, -1); break;
+            case Key.OemOpenBrackets: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 0, 1); break;
+            case Key.OemCloseBrackets: _loadedFigure = _movement.MoveFigure(_loadedFigure, 0, 0, -1); break;
+            case Key.P: Perspective = !Perspective; break;
         }
 
         Redraw();

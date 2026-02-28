@@ -28,17 +28,12 @@
                                     Height="70">
                         <StackPanel HorizontalAlignment="Center"
                                     Orientation="Horizontal">
-                            <avalonia:MaterialIcon Width="20"
-                                                   HorizontalAlignment="Right"
-                                                   Height="20"
-                                                   Margin="3"
-                                                   Kind="VectorCurve" />
-
+                            
+                            
                             <Button Margin="5 0"
                                     Height="50"
                                     Width="50"
                                     Command="{Binding LoadFigureCommand}"
-                                    IsVisible="{Binding Move}"
                                     Padding="3">
                                 <avalonia:MaterialIcon Width="25"
                                                        HorizontalAlignment="Center"
@@ -46,6 +41,7 @@
                                                        Margin="3"
                                                        Kind="File" />
                             </Button>
+                            
                             <ComboBox SelectedIndex="{Binding SelectedTransformIndex}"
                                       ItemsSource="{Binding TransformTypes}" />
 
@@ -59,7 +55,7 @@
                                                        HorizontalAlignment="Center"
                                                        Height="25"
                                                        Margin="3"
-                                                       Kind="MouseMoveUp" />
+                                                       Kind="ArrowUp" />
                             </Button>
                             <Button Margin="5 0"
                                     Height="50"
@@ -71,32 +67,76 @@
                                                        HorizontalAlignment="Center"
                                                        Height="25"
                                                        Margin="3"
-                                                       Kind="MouseMoveDown" />
+                                                       Kind="ArrowDown" />
+                            </Button>
+                            
+                            <Button Margin="5 0"
+                                    Height="50"
+                                    Width="50"
+                                    Command="{Binding MoveLeftCommand}"
+                                    IsVisible="{Binding Move}"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="ArrowLeft" />
+                            </Button>
+                            <Button Margin="5 0"
+                                    Height="50"
+                                    Command="{Binding MoveRightCommand}"
+                                    IsVisible="{Binding Move}"
+                                    Padding="3">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="ArrowRight" />
                             </Button>
 
                             <Button Margin="5 0"
-                                    Command="{Binding RotateRightCommand}"
+                                    Command="{Binding RotateXCommand}"
                                     IsVisible="{Binding Rotated}"
                                     Height="50"
-                                    Width="50"
                                     Padding="3">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3"
-                                                       Kind="RotateRight" />
+                                <StackPanel Orientation="Horizontal">
+                                    <avalonia:MaterialIcon Width="25"
+                                                           VerticalAlignment="Center"
+                                                           Height="25"
+                                                           Margin="3"
+                                                           Kind="RotateRight" />
+                                    <TextBlock VerticalAlignment="Center" Margin="0 0 6 0">X</TextBlock>
+                                </StackPanel>
                             </Button>
+                            
                             <Button Margin="5 0"
+                                    Command="{Binding RotateYCommand}"
                                     IsVisible="{Binding Rotated}"
-                                    Command="{Binding RotateLeftCommand}"
                                     Height="50"
-                                    Width="50"
                                     Padding="3">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3"
-                                                       Kind="RotateLeft" />
+                                <StackPanel Orientation="Horizontal">
+                                    <avalonia:MaterialIcon Width="25"
+                                                           VerticalAlignment="Center"
+                                                           Height="25"
+                                                           Margin="3"
+                                                           Kind="RotateRight" />
+                                    <TextBlock VerticalAlignment="Center" Margin="0 0 6 0">Y</TextBlock>
+                                </StackPanel>
+                            </Button>
+                            
+                            <Button Margin="5 0"
+                                    Command="{Binding RotateZCommand}"
+                                    IsVisible="{Binding Rotated}"
+                                    Height="50"
+                                    Padding="3">
+                                <StackPanel Orientation="Horizontal">
+                                    <avalonia:MaterialIcon Width="25"
+                                                           VerticalAlignment="Center"
+                                                           Height="25"
+                                                           Margin="3"
+                                                           Kind="RotateRight" />
+                                    <TextBlock VerticalAlignment="Center" Margin="0 0 6 0">Z</TextBlock>
+                                </StackPanel>
                             </Button>
 
                             <Button Margin="5 0"
@@ -109,8 +149,9 @@
                                                        HorizontalAlignment="Center"
                                                        Height="25"
                                                        Margin="3"
-                                                       Kind="FormatFontSizeIncrease" />
+                                                       Kind="PlusBox" />
                             </Button>
+                            
                             <Button Margin="5 0"
                                     IsVisible="{Binding Scale}"
                                     Command="{Binding SizeDecreaseCommand}"
@@ -121,7 +162,7 @@
                                                        HorizontalAlignment="Center"
                                                        Height="25"
                                                        Margin="3"
-                                                       Kind="FormatFontSizeDecrease" />
+                                                       Kind="MinusBox" />
                             </Button>
 
                             <Button Margin="5 0"

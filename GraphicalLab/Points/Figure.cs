@@ -48,19 +48,17 @@ public class Figure
     {
         List<Pixel> pixels = [];
 
-
         foreach (var point in Points)
         {
             pixels.Add(point.Perspective());
         }
-
 
         foreach (var line in Lines)
         {
             var startPoint = line.StartPoint.Ortagonal();
             var endPoint = line.EndPoint.Ortagonal();
 
-            pixels.AddRange(BrezenhemLineGenerator.DrawLine(startPoint, endPoint));
+            pixels.AddRange(XiaolinWuLineGenerator.DrawLine(startPoint, endPoint));
         }
 
         return pixels;
