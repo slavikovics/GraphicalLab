@@ -1,0 +1,18 @@
+{
+  "Lines": [
+    { "StartPoint": { "X": -40, "Y": 40, "Z": -20 }, "EndPoint": { "X": 40, "Y": 40, "Z": -20 } },
+    { "StartPoint": { "X": 40, "Y": 40, "Z": -20 }, "EndPoint": { "X": 40, "Y": -40, "Z": -20 } },
+    { "StartPoint": { "X": 40, "Y": -40, "Z": -20 }, "EndPoint": { "X": -40, "Y": -40, "Z": -20 } },
+    { "StartPoint": { "X": -40, "Y": -40, "Z": -20 }, "EndPoint": { "X": -40, "Y": 40, "Z": -20 } },
+    
+    { "StartPoint": { "X": -40, "Y": 40, "Z": 20 }, "EndPoint": { "X": 40, "Y": 40, "Z": 20 } },
+    { "StartPoint": { "X": 40, "Y": 40, "Z": 20 }, "EndPoint": { "X": 40, "Y": -40, "Z": 20 } },
+    { "StartPoint": { "X": 40, "Y": -40, "Z": 20 }, "EndPoint": { "X": -40, "Y": -40, "Z": 20 } },
+    { "StartPoint": { "X": -40, "Y": -40, "Z": 20 }, "EndPoint": { "X": -40, "Y": 40, "Z": 20 } },
+    
+    { "StartPoint": { "X": -40, "Y": 40, "Z": -20 }, "EndPoint": { "X": -40, "Y": 40, "Z": 20 } },
+    { "StartPoint": { "X": 40, "Y": 40, "Z": -20 }, "EndPoint": { "X": 40, "Y": 40, "Z": 20 } },
+    { "StartPoint": { "X": 40, "Y": -40, "Z": -20 }, "EndPoint": { "X": 40, "Y": -40, "Z": 20 } },
+    { "StartPoint": { "X": -40, "Y": -40, "Z": -20 }, "EndPoint": { "X": -40, "Y": -40, "Z": 20 } }
+  ]
+}
