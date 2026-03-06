@@ -7,7 +7,6 @@ namespace GraphicalLab.Points;
 public class Point3
 {
     private const double Tolerance = 0.03;
-    private const double K = 50;
     public double X { get; set; }
     public double Y { get; set; }
     public double Z { get; set; }
@@ -43,11 +42,6 @@ public class Point3
         if (obj.GetType() != GetType()) return false;
         return Equals((Point3)obj);
     }
-    
-    public Point4 ToPoint4()
-    {
-        return new Point4(X, Y, Z, 1);
-    }
 
     public Matrix<double> ToVector()
     {
@@ -57,16 +51,6 @@ public class Point3
         matrix.SetValue(2, 0, Z);
         matrix.SetValue(3, 0, 1);
         return matrix;
-    }
-
-    public Pixel Perspective()
-    {
-        if (Z == 0) return new Pixel((int)X, (int)Y);
-        
-        var x = X * K / Z;
-        var y = Y * K / Z;
-
-        return new Pixel((int)Math.Round(x), (int)Math.Round(y));
     }
 
     public Pixel Ortagonal()
