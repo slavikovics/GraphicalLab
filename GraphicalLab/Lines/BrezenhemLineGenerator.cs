@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GraphicalLab.Models;
 
 namespace GraphicalLab.Lines;
@@ -48,5 +49,12 @@ public static class BrezenhemLineGenerator
         }
 
         return newPoints;
+    }
+
+    public static List<Pixel> DrawTrimmedLine(Pixel start, Pixel end, int lineLength, int arrowSize = 5,
+        uint color = 0xFF4B0082)
+    {
+        List<Pixel> fullLine = DrawLine(start, end, color);
+        return fullLine.Take(Math.Min(lineLength, fullLine.Count)).ToList();
     }
 }

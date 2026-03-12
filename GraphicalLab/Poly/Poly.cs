@@ -68,4 +68,10 @@ public class Poly
         var pixels = WaypointsToPixels();
         return ConvexAnalyzer.FindConvex(pixels);
     }
+
+    public List<Pixel> DrawArrows()
+    {
+        var pixels = WaypointsToPixels();
+        return NormVectors.DrawArrows(pixels);
+    }
 }

@@ -8,9 +8,13 @@
              xmlns:local="clr-namespace:GraphicalLab.Controls.WaypointControl"
              xmlns:graphicalLab="clr-namespace:GraphicalLab"
              xmlns:controls="clr-namespace:GraphicalLab.Controls"
+             xmlns:poly="clr-namespace:GraphicalLab.Poly"
              x:DataType="vm:PolysPageViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="GraphicalLab.Views.PolysPage">
+    <UserControl.Resources>
+        <poly:EnumToStringConverter x:Key="EnumToStringConverter" />
+    </UserControl.Resources>
     <ScrollViewer>
         <StackPanel Spacing="10">
             <Grid>
@@ -87,8 +91,7 @@
                                     Height="50"
                                     Width="110"
                                     Padding="3"
-                                    Command="{Binding PickPointCommand}"
-                                    >
+                                    Command="{Binding DrawNormsCommand}">
                                 <StackPanel Orientation="Horizontal">
                                     <avalonia:MaterialIcon Width="30"
                                                            Height="30"
@@ -98,10 +101,10 @@
                                                Text="Нормали" />
                                 </StackPanel>
                             </Button>
-                            
+
                             <TextBlock Margin="0 0 5 0"
                                        VerticalAlignment="Center"
-                                       Text="Выпуклый" />
+                                       Text="{Binding ConvexResult, Converter={StaticResource EnumToStringConverter}}" />
                         </StackPanel>
                     </suki:GlassCard>
                 </Border>
@@ -170,7 +173,7 @@
                                             CanvasClickCommand="{Binding AddWaypointCommand}"
                                             ItemClickedCommand="{Binding WaypointClickedCommand}"
                                             ItemDraggedCommand="{Binding WaypointDraggedCommand}" />
-                    
+
                     <controls:PixelGridOverlay
                         BitmapWidth="{Binding BitmapWidth}"
                         BitmapHeight="{Binding BitmapHeight}"

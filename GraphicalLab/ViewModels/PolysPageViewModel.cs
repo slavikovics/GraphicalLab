@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Controls.WaypointControl;
 using GraphicalLab.Curves;
 using GraphicalLab.Models;
+using GraphicalLab.Poly;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
 
@@ -109,6 +110,7 @@ public partial class PolysPageViewModel : ViewModelBase
     [ObservableProperty] private bool _addWaypointEnabled;
     [ObservableProperty] private bool _addLineEnabled;
     [ObservableProperty] private bool _pickPointEnabled;
+    [ObservableProperty] private ConvexResult _convexResult;
 
     [RelayCommand]
     private void AddPoint()
@@ -156,6 +158,13 @@ public partial class PolysPageViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void DrawNorms()
+    {
+        var pixels = _poly.DrawArrows();
+        _debuggableBitmapControl.AddPoints(pixels);
+    }
+
+    [RelayCommand]
     private void WaypointDragged(WaypointModel? model)
     {
         Redraw();
@@ -170,6 +179,7 @@ public partial class PolysPageViewModel : ViewModelBase
     {
         List<Pixel> pixels = [];
         pixels.AddRange(_poly.Draw());
+        ConvexResult = _poly.Convex();
 
         _debuggableBitmapControl.ClearBitmap(true);
         _debuggableBitmapControl.AddPoints(pixels);
