@@ -47,6 +47,12 @@ public class Pixel
                | newB;
     }
 
+    public void Invert()
+    {
+        X = -1 * X;
+        Y = -1 * Y;
+    }
+
     protected bool Equals(Pixel other)
     {
         return X == other.X && Y == other.Y;
