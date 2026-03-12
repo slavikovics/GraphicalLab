@@ -74,13 +74,13 @@ public partial class DebuggableBitmapControl : ObservableObject, IDebuggableBitm
         AddPoints(points);
     }
 
-    public void ClearBitmap()
+    public void ClearBitmap(bool redraw = false)
     {
         PointsToDraw.Clear();
         IsNextStepAvailable = false;
         StepsCountText = $"({PointsToDraw.Count.ToString()})";
         _writableBitmapProvider.ClearBitmap();
-        WritableBitmapChanged?.Invoke();
+        if (!redraw) WritableBitmapChanged?.Invoke();
     }
 
     public void HandleDebugNextStep()

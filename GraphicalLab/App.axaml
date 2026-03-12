@@ -30,6 +30,9 @@
         <DataTemplate DataType="vm:TransformPageViewModel">
             <views:TransformPage/>
         </DataTemplate>
+        <DataTemplate DataType="vm:PolysPageViewModel">
+            <views:PolysPage/>
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>

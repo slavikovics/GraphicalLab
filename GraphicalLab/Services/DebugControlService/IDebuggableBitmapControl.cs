@@ -15,7 +15,7 @@ public interface IDebuggableBitmapControl : INotifyPropertyChanged, INotifyPrope
     event Action WritableBitmapChanged;
     void AddPoints(List<Pixel> points);
     void AddPointsToCenter(List<Pixel> points);
-    void ClearBitmap();
+    void ClearBitmap(bool redraw = false);
     void HandleDebugNextStep();
     void SetPixel(Pixel pixel);
     WriteableBitmap GetBitmap();

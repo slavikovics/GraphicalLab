@@ -46,5 +46,9 @@
         <DependentUpon>TransformPage.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Views\PolysPage.axaml.cs">
+        <DependentUpon>PolysPage.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

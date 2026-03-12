@@ -31,6 +31,7 @@ public partial class App : Application
         serviceCollection.AddSingleton<LinesPageViewModel>();
         serviceCollection.AddSingleton<CirclesPageViewModel>();
         serviceCollection.AddSingleton<CurvesPageViewModel>();
+        serviceCollection.AddSingleton<PolysPageViewModel>();
         serviceCollection.AddSingleton<IObjToFigureConverter, ObjToFigureConverter>();
         serviceCollection.AddSingleton<Rotate>();
         serviceCollection.AddSingleton<Move>();

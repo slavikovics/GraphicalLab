@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia;
+using GraphicalLab.Models;
 
 namespace GraphicalLab.Controls.WaypointControl;
 
@@ -39,6 +40,14 @@ public class WaypointModel : INotifyPropertyChanged
     public Point GetAbsolutePosition(Size canvasSize)
     {
         return new Point(
+            X * canvasSize.Width,
+            Y * canvasSize.Height
+        );
+    }
+    
+    public Pixel ToPixel(Size canvasSize)
+    {
+        return new Pixel(
             X * canvasSize.Width,
             Y * canvasSize.Height
         );

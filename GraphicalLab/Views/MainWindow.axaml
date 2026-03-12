@@ -93,6 +93,21 @@
                 </suki:SukiSideMenuItem.PageContent>
             </suki:SukiSideMenuItem>
             
+            <!-- Polys Page -->
+            
+            <suki:SukiSideMenuItem Header="Полигоны">
+                <suki:SukiSideMenuItem.Icon>
+                    <avalonia:MaterialIcon Width="20"
+                                           Height="20"
+                                           VerticalAlignment="Center"
+                                           Foreground="White"
+                                           Kind="VectorPolygon" />
+                </suki:SukiSideMenuItem.Icon>
+                <suki:SukiSideMenuItem.PageContent>
+                    <ContentControl Content="{Binding PolysPageViewModel}"/>
+                </suki:SukiSideMenuItem.PageContent>
+            </suki:SukiSideMenuItem>
+            
         </suki:SukiSideMenu.Items>
     </suki:SukiSideMenu>
 </suki:SukiWindow>
