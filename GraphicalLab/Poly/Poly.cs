@@ -35,6 +35,13 @@ public class Poly
         _closed = true;
     }
 
+    private List<Pixel> WaypointsToPixels()
+    {
+        var pixels = new List<Pixel>();
+        foreach (var p in _points) pixels.Add(p.ToPixel(_canvasSize));
+        return pixels;
+    }
+
     public List<Pixel> Draw()
     {
         List<Pixel> pixels = [];
@@ -54,5 +61,11 @@ public class Poly
         }
 
         return pixels;
+    }
+
+    public ConvexResult Convex()
+    {
+        var pixels = WaypointsToPixels();
+        return ConvexAnalyzer.FindConvex(pixels);
     }
 }
