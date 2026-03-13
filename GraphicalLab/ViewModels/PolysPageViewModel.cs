@@ -129,6 +129,19 @@ public partial class PolysPageViewModel : ViewModelBase
 
     private void DrawJarvis()
     {
+        var canvasSize = new Size(_debuggableBitmapControl.GetBitmapWidth(),
+            _debuggableBitmapControl.GetBitmapHeight());
+        var points = WaypointModel.ToPixels(Waypoints.ToList(), canvasSize);
+        var newPoints = Jarvis.Draw(points);
+
+        var poly = new Poly.Poly(canvasSize, newPoints);
+        poly.Close(null);
+        _debuggableBitmapControl.ClearBitmap();
+        var pixels = poly.Draw();
+        _debuggableBitmapControl.AddPoints(pixels);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Построена оболочка", $"Алгоритм: Джарвис.",
+                NotificationType.Success);
     }
 
     [ObservableProperty] private bool _addWaypointEnabled;
