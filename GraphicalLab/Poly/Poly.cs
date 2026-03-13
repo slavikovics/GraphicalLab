@@ -18,6 +18,14 @@ public class Poly
         _canvasSize = canvasSize;
     }
 
+    public Poly(Size canvasSize, List<Pixel> points)
+    {
+        _points = [];
+        foreach (var point in points)
+            _points?.Add(new WaypointModel { X = point.X / canvasSize.Width, Y = point.Y / canvasSize.Height });
+        _canvasSize = canvasSize;
+    }
+
     public void Clear()
     {
         _points.Clear();
@@ -31,8 +39,7 @@ public class Poly
 
     public void Close(WaypointModel? model)
     {
-        if (model != _points[0]) return;
-        _closed = true;
+        if (model == null || model == _points[0]) _closed = true;
     }
 
     private List<Pixel> WaypointsToPixels()

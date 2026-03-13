@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia;
@@ -58,5 +59,16 @@ public class WaypointModel : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    public static List<Pixel> ToPixels(List<WaypointModel> waypoints, Size canvasSize)
+    {
+        List<Pixel> result = [];
+        foreach (var waypoint in waypoints)
+        {
+            result.Add(waypoint.ToPixel(canvasSize));
+        }
+        
+        return result;
     }
 }

@@ -9,7 +9,6 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Controls.WaypointControl;
-using GraphicalLab.Curves;
 using GraphicalLab.Models;
 using GraphicalLab.Poly;
 using GraphicalLab.Services.DebugControlService;
@@ -104,7 +103,32 @@ public partial class PolysPageViewModel : ViewModelBase
 
     private void InitializePolys()
     {
-        _polyTypesMatch = new Dictionary<int, DrawPolyDelegate>();
+        _polyTypesMatch = new Dictionary<int, DrawPolyDelegate>
+        {
+            { 0, DrawGraham },
+            { 1, DrawJarvis }
+        };
+    }
+
+    private void DrawGraham()
+    {
+        var canvasSize = new Size(_debuggableBitmapControl.GetBitmapWidth(),
+            _debuggableBitmapControl.GetBitmapHeight());
+        var points = WaypointModel.ToPixels(Waypoints.ToList(), canvasSize);
+        var newPoints = Graham.Draw(points);
+
+        var poly = new Poly.Poly(canvasSize, newPoints);
+        poly.Close(null);
+        _debuggableBitmapControl.ClearBitmap();
+        var pixels = poly.Draw();
+        _debuggableBitmapControl.AddPoints(pixels);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Построена оболочка", $"Алгоритм: Грэхем.",
+                NotificationType.Success);
+    }
+
+    private void DrawJarvis()
+    {
     }
 
     [ObservableProperty] private bool _addWaypointEnabled;
@@ -137,8 +161,9 @@ public partial class PolysPageViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void BuildCapsule()
+    private void BuildHull()
     {
+        _polyTypesMatch[SelectedPolyIndex].Invoke();
     }
 
     [RelayCommand]
