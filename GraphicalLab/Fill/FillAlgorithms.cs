@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphicalLab.Models;
 
-namespace GraphicalLab.Poly;
+namespace GraphicalLab.Fill;
 
 public static class FillAlgorithms
 {

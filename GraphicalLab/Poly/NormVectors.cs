@@ -6,7 +6,7 @@ namespace GraphicalLab.Poly;
 
 public class NormVectors
 {
-    public static List<Pixel> DrawArrows(List<Pixel> pixels)
+    public static List<Pixel> DrawNorms(List<Pixel> pixels)
     {
         List<Pixel> result = [];
         if (pixels.Count < 3) return result;

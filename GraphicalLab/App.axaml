@@ -33,6 +33,9 @@
         <DataTemplate DataType="vm:PolysPageViewModel">
             <views:PolysPage/>
         </DataTemplate>
+        <DataTemplate DataType="vm:FillPageViewModel">
+            <views:FillPage/>
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>

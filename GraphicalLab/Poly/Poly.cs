@@ -100,6 +100,6 @@ public class Poly
     public List<Pixel> DrawNorms()
     {
         var pixels = EdgePointsToPixels();
-        return NormVectors.DrawArrows(pixels);
+        return NormVectors.DrawNorms(pixels);
     }
 }

@@ -50,5 +50,9 @@
         <DependentUpon>PolysPage.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Views\FillPage.axaml.cs">
+        <DependentUpon>FillPage.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>
