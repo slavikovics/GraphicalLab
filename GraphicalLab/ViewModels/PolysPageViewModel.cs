@@ -123,6 +123,8 @@ public partial class PolysPageViewModel : ViewModelBase
 
             Redraw();
         }
+
+        if (e.PropertyName == nameof(AutoNorms)) Redraw();
     }
 
     private void DebuggableBitmapControlOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -222,7 +224,7 @@ public partial class PolysPageViewModel : ViewModelBase
     [RelayCommand]
     private void DrawNorms()
     {
-        var pixels = _poly.DrawArrows();
+        var pixels = _poly.DrawNorms();
         _debuggableBitmapControl.AddPoints(pixels);
     }
 
@@ -286,6 +288,7 @@ public partial class PolysPageViewModel : ViewModelBase
     {
         List<Pixel> pixels = [];
         pixels.AddRange(_poly.Draw());
+        if (AutoNorms) pixels.AddRange(_poly.DrawNorms());
         ConvexResult = _poly.Convex();
 
         _debuggableBitmapControl.ClearBitmap(true);

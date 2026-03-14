@@ -21,7 +21,7 @@ public class EnumToStringConverter : IValueConverter
             case ConvexResult.AllPositive:
                 return placeholder + "Выпуклый";
             case ConvexResult.AllZero:
-                return placeholder + "Выроожден";
+                return placeholder + "Вырожден";
             case ConvexResult.Mixed:
                 return placeholder + "Вогнутый";
             default:

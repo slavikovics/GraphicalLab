@@ -40,7 +40,7 @@
                                                    Kind="VectorCurve" />
                             <ComboBox SelectedIndex="{Binding SelectedPolyIndex}"
                                       ItemsSource="{Binding PolyTypes}" />
-                            <Button Margin="5 0 10 0"
+                            <Button Margin="5 0 15 0"
                                     Height="50"
                                     Width="50"
                                     Padding="3"
@@ -49,32 +49,19 @@
                                 <avalonia:MaterialIcon Width="25"
                                                        HorizontalAlignment="Center"
                                                        Height="25"
-                                                       Margin="3"
+                                                       Margin="3 "
                                                        Kind="Hammer" />
                             </Button>
                             
                             <StackPanel Orientation="Horizontal"
                                         IsVisible="{Binding NormsEnabled}"
-                                        Margin="10 15 0 10">
+                                        Margin="10 0 10 0">
+                                <avalonia:MaterialIcon Width="20"
+                                                       Height="20"
+                                                       Kind="AxisArrow" />
+                                <TextBlock Margin="5 0" VerticalAlignment="Center">Нормали:</TextBlock>
                                 <ToggleSwitch IsChecked="{Binding AutoNorms}" />
-                                <TextBlock VerticalAlignment="Center">Автонормали</TextBlock>
                             </StackPanel>
-
-                            <Button Margin="5 0 10 0"
-                                    IsVisible="{Binding NormsEnabled}"
-                                    Height="50"
-                                    Width="110"
-                                    Padding="3"
-                                    Command="{Binding DrawNormsCommand}">
-                                <StackPanel Orientation="Horizontal">
-                                    <avalonia:MaterialIcon Width="30"
-                                                           Height="30"
-                                                           Kind="AxisArrow" />
-                                    <TextBlock Margin="7 0 0 0"
-                                               VerticalAlignment="Center"
-                                               Text="Нормали" />
-                                </StackPanel>
-                            </Button>
 
                             <avalonia:MaterialIcon Width="20"
                                                    Height="20"
@@ -85,12 +72,13 @@
                                        VerticalAlignment="Center"
                                        Text="{Binding ConvexResult, Converter={StaticResource EnumToStringConverter}}" />
                             
-                            <avalonia:MaterialIcon Width="20"
-                                                   Height="20"
+                            <avalonia:MaterialIcon Width="40"
+                                                   Margin="5 0 0 0"
+                                                   Height="40"
                                                    VerticalAlignment="Center"
                                                    Foreground="White"
                                                    Kind="VectorPoint" />
-                            <TextBlock Margin="5 0"
+                            <TextBlock 
                                        VerticalAlignment="Center"
                                        Text="{Binding PointInfo.DisplayText}" />
                             

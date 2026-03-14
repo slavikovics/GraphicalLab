@@ -97,7 +97,7 @@ public class Poly
         return ConvexAnalyzer.FindConvex(pixels);
     }
 
-    public List<Pixel> DrawArrows()
+    public List<Pixel> DrawNorms()
     {
         var pixels = EdgePointsToPixels();
         return NormVectors.DrawArrows(pixels);
