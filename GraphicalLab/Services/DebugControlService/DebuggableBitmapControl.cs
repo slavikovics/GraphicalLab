@@ -94,9 +94,22 @@ public partial class DebuggableBitmapControl : ObservableObject, IDebuggableBitm
         if (PointsToDraw.Count == 0) IsNextStepAvailable = false;
     }
 
+    public void HandleBulk(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            HandleDebugNextStep();
+        }
+    }
+
     public WriteableBitmap GetBitmap()
     {
         return _writableBitmapProvider.GetBitmap();
+    }
+
+    public uint[,] GetPixelMatrix()
+    {
+        return _writableBitmapProvider.GetPixelMatrix();
     }
 
     public int GetBitmapWidth()

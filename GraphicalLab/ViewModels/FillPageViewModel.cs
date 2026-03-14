@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GraphicalLab.Lines;
+using GraphicalLab.Fill;
 using GraphicalLab.Models;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
@@ -17,18 +17,19 @@ public partial class FillPageViewModel : ViewModelBase
 {
     private readonly IToastManager _toastManager;
     private readonly IDebuggableBitmapControl _debuggableBitmapControl;
+    private readonly PolysPageViewModel _polysPageViewModel;
 
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
     public WriteableBitmap Bitmap => _debuggableBitmapControl.GetBitmap();
-    
+
     public Image? TargetImage = null;
     private Pixel? _firstPoint;
 
     [ObservableProperty] private bool _isNextStepAvailable;
     [ObservableProperty] private string _stepsCountText;
-    [ObservableProperty] private int _selectedLineIndex;
-    
+    [ObservableProperty] private int _selectedFillIndex;
+
     public bool IsGridVisible
     {
         get;
@@ -36,7 +37,7 @@ public partial class FillPageViewModel : ViewModelBase
         {
             SetProperty(ref field, value);
             _debuggableBitmapControl.IsGridVisible = value;
-        } 
+        }
     }
 
     public bool IsDebugEnabled
@@ -46,22 +47,29 @@ public partial class FillPageViewModel : ViewModelBase
         {
             SetProperty(ref field, value);
             _debuggableBitmapControl.IsDebugEnabled = value;
-        } 
+        }
     }
 
-    [ObservableProperty] private List<string> _lineTypes = ["ЦДА", "Брезенхем", "Ву"];
+    [ObservableProperty] private List<string> _lineTypes =
+    [
+        "Растровая развёртка с упорядоченным списком рёбер", "Растровая развёртка со списком активных рёбер",
+        "Простой алгоритм заполнения с затравкой", "Построчный алгоритм заполнения с затравкой"
+    ];
 
-    private delegate void DrawLineDelegate(Pixel start, Pixel end, uint color);
+    private delegate void DrawLineDelegate(Pixel start, List<Pixel> polygon, uint[,] pixels, int width, int height,
+        uint color = 0xFF0000FF);
 
-    private Dictionary<int, DrawLineDelegate> _lineTypesMatch = null!;
+    private Dictionary<int, DrawLineDelegate> _fillTypesMatch = null!;
 
-    public FillPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
+    public FillPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl,
+        PolysPageViewModel polysPageViewModel)
     {
         _toastManager = toastManager;
         _debuggableBitmapControl = debuggableBitmapControl;
+        _polysPageViewModel = polysPageViewModel;
         _debuggableBitmapControl.WritableBitmapChanged += UpdateImage;
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
-        InitializeLines();
+        InitializeFills();
         InitializeProperties();
     }
 
@@ -84,26 +92,25 @@ public partial class FillPageViewModel : ViewModelBase
             IsGridVisible = _debuggableBitmapControl.IsGridVisible;
         }
     }
-    
+
     private void InitializeProperties()
     {
         IsGridVisible = _debuggableBitmapControl.IsGridVisible;
-        SelectedLineIndex = 0;
-        IsNextStepAvailable =_debuggableBitmapControl.IsNextStepAvailable;
+        SelectedFillIndex = 0;
+        IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
         StepsCountText = _debuggableBitmapControl.StepsCountText;
     }
 
-    private void InitializeLines()
+    private void InitializeFills()
     {
-        _lineTypesMatch = new Dictionary<int, DrawLineDelegate>();
-        var ddaDelegate = new DrawLineDelegate(DrawLineDda);
-        var brezenhemDelegate = new DrawLineDelegate(DrawLineBrezenhem);
-        var wuDelegate = new DrawLineDelegate(DrawLineWu);
-
-        _lineTypesMatch.Add(0, DrawLineDda);
-        _lineTypesMatch.Add(1, DrawLineBrezenhem);
-        _lineTypesMatch.Add(2, DrawLineWu);
+        _fillTypesMatch = new Dictionary<int, DrawLineDelegate>
+        {
+            { 0, ScanlineWithSortedEdges },
+            { 1, ScanlineWithAet },
+            { 2, SimpleFloodFill },
+            { 3, ScanlineFloodFill }
+        };
     }
 
     [RelayCommand]
@@ -116,17 +123,11 @@ public partial class FillPageViewModel : ViewModelBase
         int x = (int)(point.X / scale);
         int y = (int)(point.Y / scale);
 
-        _debuggableBitmapControl.SetPixel(new Pixel(x, y));
+        var start = new Pixel(x, y);
+        var matrix = _debuggableBitmapControl.GetPixelMatrix();
+        var polygon = _polysPageViewModel.Poly.EdgePointsToPixels();
 
-        if (_firstPoint is null)
-        {
-            _firstPoint = new Pixel(x, y);
-        }
-        else
-        {
-            _lineTypesMatch[SelectedLineIndex].Invoke(_firstPoint, new Pixel(x, y), 0xFF0000FF);
-            _firstPoint = null;
-        }
+        _fillTypesMatch[SelectedFillIndex].Invoke(start, polygon, matrix, BitmapWidth, BitmapHeight);
     }
 
     private void UpdateImage()
@@ -134,28 +135,46 @@ public partial class FillPageViewModel : ViewModelBase
         TargetImage?.InvalidateVisual();
     }
 
-    private void DrawLineDda(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    private void ScanlineWithSortedEdges(Pixel start, List<Pixel> polygon, uint[,] pixels, int width, int height,
+        uint color = 0xFF0000FF)
     {
-        var points = DdaLineGenerator.DrawLine(start, end, color);
+        var points = FillAlgorithms.ScanlineWithSortedEdges(polygon, pixels, width, height, color);
         _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled) _toastManager.ShowToast("Нарисован отрезок", $"Алгоритм: ЦДА, Начало: {start}, Конец: {end}",
-            NotificationType.Success);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Произведена заливка",
+                "Алгоритм: Растровая развёртка с упорядоченным списком рёбер",
+                NotificationType.Success);
     }
 
-    private void DrawLineBrezenhem(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    private void ScanlineWithAet(Pixel start, List<Pixel> polygon, uint[,] pixels, int width, int height,
+        uint color = 0xFF0000FF)
     {
-        var points = BrezenhemLineGenerator.DrawLine(start, end, color);
+        var points = FillAlgorithms.ScanlineWithAet(polygon, pixels, width, height, color);
         _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled) _toastManager.ShowToast("Нарисован отрезок", $"Алгоритм: Брезенхем, Начало: {start}, Конец: {end}",
-            NotificationType.Success);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Произведена заливка",
+                "Алгоритм: Растровая развёртка с упорядоченным списком рёбер, использующая список активных рёбер",
+                NotificationType.Success);
     }
 
-    private void DrawLineWu(Pixel start, Pixel end, uint color = 0xFF0000FF)
+    private void SimpleFloodFill(Pixel start, List<Pixel> polygon, uint[,] pixels, int width, int height,
+        uint color = 0xFF0000FF)
     {
-        var points = XiaolinWuLineGenerator.DrawLine(start, end, color);
+        var points = FillAlgorithms.SimpleFloodFill(start, pixels, width, height, color);
         _debuggableBitmapControl.AddPoints(points);
-        if (!IsDebugEnabled) _toastManager.ShowToast("Нарисован отрезок", $"Алгоритм: Ву, Начало: {start}, Конец: {end}",
-            NotificationType.Success);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Произведена заливка", "Алгоритм: Простой алгоритм заполнения с затравкой",
+                NotificationType.Success);
+    }
+
+    private void ScanlineFloodFill(Pixel start, List<Pixel> polygon, uint[,] pixels, int width, int height,
+        uint color = 0xFF0000FF)
+    {
+        var points = FillAlgorithms.ScanlineFloodFill(start, pixels, width, height, color);
+        _debuggableBitmapControl.AddPoints(points);
+        if (!IsDebugEnabled)
+            _toastManager.ShowToast("Произведена заливка", "Алгоритм: Построчный алгоритм заполнения с затравкой",
+                NotificationType.Success);
     }
 
     [RelayCommand]
@@ -167,6 +186,6 @@ public partial class FillPageViewModel : ViewModelBase
     [RelayCommand]
     private void HandleDebugNextStep()
     {
-        _debuggableBitmapControl.HandleDebugNextStep();
+        _debuggableBitmapControl.HandleBulk(60);
     }
 }

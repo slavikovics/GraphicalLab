@@ -50,7 +50,6 @@ public partial class PolysPageViewModel : ViewModelBase
         {
             SetProperty(ref field, value);
             _debuggableBitmapControl.IsDebugEnabled = value;
-            Redraw();
         }
     }
 
@@ -61,7 +60,7 @@ public partial class PolysPageViewModel : ViewModelBase
 
     private Dictionary<int, DrawPolyDelegate> _polyTypesMatch = null!;
     public ObservableCollection<WaypointModel> Waypoints { get; } = [];
-    private Poly.Poly _poly;
+    public Poly.Poly Poly;
 
     public PolysPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
     {
@@ -149,7 +148,7 @@ public partial class PolysPageViewModel : ViewModelBase
     private void InitializeProperties()
     {
         IsGridVisible = _debuggableBitmapControl.IsGridVisible;
-        _poly = new Poly.Poly(new Size(_debuggableBitmapControl.GetBitmapWidth(),
+        Poly = new Poly.Poly(new Size(_debuggableBitmapControl.GetBitmapWidth(),
             _debuggableBitmapControl.GetBitmapHeight()));
         SelectedPolyIndex = 0;
         NormsEnabled = true;
@@ -176,9 +175,9 @@ public partial class PolysPageViewModel : ViewModelBase
         var points = WaypointModel.ToPixels(Waypoints.ToList(), canvasSize);
         var newPoints = Graham.Draw(points);
 
-        _poly.Clear();
-        _poly.AddRange(newPoints);
-        _poly.Close(null);
+        Poly.Clear();
+        Poly.AddRange(newPoints);
+        Poly.Close(null);
         Redraw();
     }
 
@@ -189,9 +188,9 @@ public partial class PolysPageViewModel : ViewModelBase
         var points = WaypointModel.ToPixels(Waypoints.ToList(), canvasSize);
         var newPoints = Jarvis.Draw(points);
 
-        _poly.Clear();
-        _poly.AddRange(newPoints);
-        _poly.Close(null);
+        Poly.Clear();
+        Poly.AddRange(newPoints);
+        Poly.Close(null);
         Redraw();
     }
 
@@ -213,7 +212,7 @@ public partial class PolysPageViewModel : ViewModelBase
         var newWaypoint = new WaypointModel { X = center.X, Y = center.Y };
         Waypoints.Add(newWaypoint);
 
-        if (BuildEnabled) _poly.AddPoint(newWaypoint);
+        if (BuildEnabled) Poly.AddPoint(newWaypoint);
         else if (HullBuildEnabled) BuildHull();
         Redraw();
     }
@@ -222,14 +221,14 @@ public partial class PolysPageViewModel : ViewModelBase
     private void WaypointClicked(WaypointModel? model)
     {
         if (!BuildEnabled) return;
-        _poly.Close(model);
+        Poly.Close(model);
         Redraw();
     }
 
     [RelayCommand]
     private void DrawNorms()
     {
-        var pixels = _poly.DrawNorms();
+        var pixels = Poly.DrawNorms();
         _debuggableBitmapControl.AddPoints(pixels);
     }
 
@@ -257,13 +256,13 @@ public partial class PolysPageViewModel : ViewModelBase
         {
             var secondPoint = new Pixel(x, y);
             var pixels = BrezenhemLineGenerator.DrawLine(_firstPoint, secondPoint, 0xFF228B22);
-            pixels.AddRange(_poly.Draw());
+            pixels.AddRange(Poly.Draw());
 
             _debuggableBitmapControl.ClearBitmap();
             _debuggableBitmapControl.AddPoints(pixels);
 
             var intersections =
-                IntersectionCalculator.FindAllIntersections(_firstPoint, secondPoint, _poly.EdgePointsToPixels());
+                IntersectionCalculator.FindAllIntersections(_firstPoint, secondPoint, Poly.EdgePointsToPixels());
 
             if (!IsDebugEnabled)
             {
@@ -294,7 +293,7 @@ public partial class PolysPageViewModel : ViewModelBase
 
         var point = new Pixel(x, y);
         PointInfo.Point = point;
-        PointInfo.IsInside = InsideChecker.IsInside(point, _poly.EdgePointsToPixels());
+        PointInfo.IsInside = InsideChecker.IsInside(point, Poly.EdgePointsToPixels());
     }
 
     private void UpdateImage()
@@ -305,9 +304,9 @@ public partial class PolysPageViewModel : ViewModelBase
     private void Redraw()
     {
         List<Pixel> pixels = [];
-        pixels.AddRange(_poly.Draw());
-        if (AutoNorms) pixels.AddRange(_poly.DrawNorms());
-        ConvexResult = _poly.Convex();
+        pixels.AddRange(Poly.Draw());
+        if (AutoNorms) pixels.AddRange(Poly.DrawNorms());
+        ConvexResult = Poly.Convex();
 
         _debuggableBitmapControl.ClearBitmap(true);
         _debuggableBitmapControl.AddPoints(pixels);
@@ -317,13 +316,13 @@ public partial class PolysPageViewModel : ViewModelBase
     public void ClearBitmap()
     {
         Waypoints.Clear();
-        _poly.Clear();
+        Poly.Clear();
         _debuggableBitmapControl.ClearBitmap();
     }
 
     [RelayCommand]
     private void HandleDebugNextStep()
     {
-        _debuggableBitmapControl.HandleDebugNextStep();
+        _debuggableBitmapControl.HandleBulk(10);
     }
 }

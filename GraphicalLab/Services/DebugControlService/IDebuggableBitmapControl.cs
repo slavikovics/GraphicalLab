@@ -17,7 +17,9 @@ public interface IDebuggableBitmapControl : INotifyPropertyChanged, INotifyPrope
     void AddPointsToCenter(List<Pixel> points);
     void ClearBitmap(bool redraw = false);
     void HandleDebugNextStep();
+    void HandleBulk(int count);
     void SetPixel(Pixel pixel);
+    uint[,] GetPixelMatrix();
     WriteableBitmap GetBitmap();
     int GetBitmapWidth();
     int GetBitmapHeight();

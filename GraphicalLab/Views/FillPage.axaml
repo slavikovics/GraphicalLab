@@ -31,12 +31,12 @@
                                                    HorizontalAlignment="Right"
                                                    Height="20"
                                                    Margin="5"
-                                                   Kind="FormatLineStyle" />
+                                                   Kind="FormatPaint" />
                             <TextBlock VerticalAlignment="Center"
                                        Margin="5">
-                                Алгоритм построения отрезков:
+                                Алгоритм заливки:
                             </TextBlock>
-                            <ComboBox SelectedIndex="{Binding SelectedLineIndex}"
+                            <ComboBox SelectedIndex="{Binding SelectedFillIndex}"
                                       ItemsSource="{Binding LineTypes}" />
                         </StackPanel>
 

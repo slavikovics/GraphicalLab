@@ -13,15 +13,20 @@ public static class FillAlgorithms
         public double X;
         public double Dx;
         public int YMin;
-        
+
         public Edge(int yMax, double x, double dx, int yMin)
         {
-            YMax = yMax; X = x; Dx = dx; YMin = yMin;
+            YMax = yMax;
+            X = x;
+            Dx = dx;
+            YMin = yMin;
         }
     }
 
-    public static List<Pixel> ScanlineWithSortedEdges(List<Pixel> polygon, uint[,] pixels, int width, int height, uint color)
+    public static List<Pixel> ScanlineWithSortedEdges(List<Pixel> polygon, uint[,] pixels, int width, int height,
+        uint color)
     {
+        if (polygon.Count < 3) return [];
         var result = new List<Pixel>();
         var edges = new List<Edge>();
         int yMin = polygon.Min(p => p.Y);
@@ -34,45 +39,38 @@ public static class FillAlgorithms
         {
             Pixel p1 = polygon[i];
             Pixel p2 = polygon[(i + 1) % polygon.Count];
-            
+
             if (p1.Y == p2.Y) continue;
-            
+
             if (p1.Y > p2.Y)
             {
                 (p1, p2) = (p2, p1);
             }
-            
+
             double dx = (double)(p2.X - p1.X) / (p2.Y - p1.Y);
             edges.Add(new Edge(p2.Y, p1.X, dx, p1.Y));
         }
 
-        edges = edges.OrderBy(e => e.YMin).ToList();
-
         for (int y = yMin; y <= yMax; y++)
         {
             var activeEdges = edges.Where(e => e.YMin <= y && e.YMax > y)
-                                   .OrderBy(e => e.X)
-                                   .ToList();
+                .Select(e => new Edge(e.YMax, e.X + e.Dx * (y - e.YMin), e.Dx, e.YMin))
+                .OrderBy(e => e.X)
+                .ToList();
 
             for (int i = 0; i < activeEdges.Count - 1; i += 2)
             {
                 int xStart = (int)Math.Ceiling(activeEdges[i].X);
                 int xEnd = (int)Math.Floor(activeEdges[i + 1].X);
-                
+
                 xStart = Math.Max(0, xStart);
                 xEnd = Math.Min(width - 1, xEnd);
-                
+
                 for (int x = xStart; x <= xEnd; x++)
                 {
                     pixels[x, y] = color;
                     result.Add(new Pixel(x, y, color));
                 }
-            }
-
-            for (int j = 0; j < activeEdges.Count; j++)
-            {
-                var edge = activeEdges[j];
-                edge.X += edge.Dx;
             }
         }
 
@@ -81,6 +79,7 @@ public static class FillAlgorithms
 
     public static List<Pixel> ScanlineWithAet(List<Pixel> polygon, uint[,] pixels, int width, int height, uint color)
     {
+        if (polygon.Count < 3) return [];
         var result = new List<Pixel>();
         var edges = new List<Edge>();
         int yMin = polygon.Min(p => p.Y);
@@ -93,14 +92,14 @@ public static class FillAlgorithms
         {
             Pixel p1 = polygon[i];
             Pixel p2 = polygon[(i + 1) % polygon.Count];
-            
+
             if (p1.Y == p2.Y) continue;
-            
+
             if (p1.Y > p2.Y)
             {
                 (p1, p2) = (p2, p1);
             }
-            
+
             double dx = (double)(p2.X - p1.X) / (p2.Y - p1.Y);
             edges.Add(new Edge(p2.Y, p1.X, dx, p1.Y));
         }
@@ -118,10 +117,10 @@ public static class FillAlgorithms
             {
                 int xStart = (int)Math.Ceiling(activeEdges[i].X);
                 int xEnd = (int)Math.Floor(activeEdges[i + 1].X);
-                
+
                 xStart = Math.Max(0, xStart);
                 xEnd = Math.Min(width - 1, xEnd);
-                
+
                 for (int x = xStart; x <= xEnd; x++)
                 {
                     pixels[x, y] = color;
@@ -143,25 +142,25 @@ public static class FillAlgorithms
     public static List<Pixel> SimpleFloodFill(Pixel start, uint[,] pixels, int width, int height, uint fillColor)
     {
         var result = new List<Pixel>();
-        
+
         if (start.X < 0 || start.X >= width || start.Y < 0 || start.Y >= height)
             return result;
-            
+
         uint targetColor = pixels[start.X, start.Y];
-        
+
         if (targetColor == fillColor)
             return result;
-            
+
         var stack = new Stack<Pixel>();
         stack.Push(start);
 
         while (stack.Count > 0)
         {
             Pixel current = stack.Pop();
-            
+
             if (current.X < 0 || current.X >= width || current.Y < 0 || current.Y >= height)
                 continue;
-                
+
             if (pixels[current.X, current.Y] == targetColor)
             {
                 pixels[current.X, current.Y] = fillColor;
@@ -180,15 +179,15 @@ public static class FillAlgorithms
     public static List<Pixel> ScanlineFloodFill(Pixel start, uint[,] pixels, int width, int height, uint fillColor)
     {
         var result = new List<Pixel>();
-        
+
         if (start.X < 0 || start.X >= width || start.Y < 0 || start.Y >= height)
             return result;
-            
+
         uint targetColor = pixels[start.X, start.Y];
-        
+
         if (targetColor == fillColor)
             return result;
-            
+
         var stack = new Stack<Pixel>();
         stack.Push(start);
 
@@ -202,6 +201,7 @@ public static class FillAlgorithms
             {
                 x--;
             }
+
             x++;
 
             bool spanAbove = false;
@@ -239,26 +239,27 @@ public static class FillAlgorithms
         return result;
     }
 
-    public static List<Pixel> BoundaryFill4(Pixel start, uint[,] pixels, int width, int height, uint fillColor, uint borderColor)
+    public static List<Pixel> BoundaryFill4(Pixel start, uint[,] pixels, int width, int height, uint fillColor,
+        uint borderColor)
     {
         var result = new List<Pixel>();
-        
+
         if (start.X < 0 || start.X >= width || start.Y < 0 || start.Y >= height)
             return result;
-            
+
         if (pixels[start.X, start.Y] == borderColor || pixels[start.X, start.Y] == fillColor)
             return result;
-            
+
         var queue = new Queue<Pixel>();
         queue.Enqueue(start);
 
         while (queue.Count > 0)
         {
             Pixel current = queue.Dequeue();
-            
+
             if (current.X < 0 || current.X >= width || current.Y < 0 || current.Y >= height)
                 continue;
-                
+
             if (pixels[current.X, current.Y] != borderColor && pixels[current.X, current.Y] != fillColor)
             {
                 pixels[current.X, current.Y] = fillColor;
@@ -274,26 +275,27 @@ public static class FillAlgorithms
         return result;
     }
 
-    public static List<Pixel> BoundaryFill8(Pixel start, uint[,] pixels, int width, int height, uint fillColor, uint borderColor)
+    public static List<Pixel> BoundaryFill8(Pixel start, uint[,] pixels, int width, int height, uint fillColor,
+        uint borderColor)
     {
         var result = new List<Pixel>();
-        
+
         if (start.X < 0 || start.X >= width || start.Y < 0 || start.Y >= height)
             return result;
-            
+
         if (pixels[start.X, start.Y] == borderColor || pixels[start.X, start.Y] == fillColor)
             return result;
-            
+
         var queue = new Queue<Pixel>();
         queue.Enqueue(start);
 
         while (queue.Count > 0)
         {
             Pixel current = queue.Dequeue();
-            
+
             if (current.X < 0 || current.X >= width || current.Y < 0 || current.Y >= height)
                 continue;
-                
+
             if (pixels[current.X, current.Y] != borderColor && pixels[current.X, current.Y] != fillColor)
             {
                 pixels[current.X, current.Y] = fillColor;
