@@ -47,6 +47,16 @@ public class Poly
         _points.Add(p);
         _edgePoints.Add(p);
     }
+    
+    public void AddRange(List<Pixel> points)
+    {
+        foreach (var p in points)
+        {
+            var wp = new  WaypointModel { X = p.X / _canvasSize.Width, Y = p.Y / _canvasSize.Height };
+            _points.Add(wp);
+            _edgePoints.Add(wp);
+        }
+    }
 
     public void Close(WaypointModel? model)
     {

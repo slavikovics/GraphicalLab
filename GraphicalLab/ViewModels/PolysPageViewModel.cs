@@ -77,7 +77,7 @@ public partial class PolysPageViewModel : ViewModelBase
 
     [ObservableProperty] private bool _normsEnabled;
     [ObservableProperty] private bool _autoNorms;
-    [ObservableProperty] private bool _autoConnect;
+    [ObservableProperty] private bool _buildEnabled;
     [ObservableProperty] private bool _hullBuildEnabled;
     [ObservableProperty] private bool _addLineEnabled;
     [ObservableProperty] private ConvexResult _convexResult;
@@ -87,7 +87,7 @@ public partial class PolysPageViewModel : ViewModelBase
     {
         NormsEnabled = false;
         AutoNorms = false;
-        AutoConnect = false;
+        BuildEnabled = false;
         HullBuildEnabled = false;
         AddLineEnabled = false;
         _firstPoint = null;
@@ -102,22 +102,26 @@ public partial class PolysPageViewModel : ViewModelBase
                 case 0:
                     SetAllToFalse();
                     NormsEnabled = true;
+                    BuildEnabled = true;
+                    ClearBitmap();
                     break;
                 case 1:
                     SetAllToFalse();
                     HullBuildEnabled = true;
-                    _poly.Clear();
+                    BuildHull();
                     break;
                 case 2:
                     SetAllToFalse();
                     HullBuildEnabled = true;
-                    _poly.Clear();
+                    BuildHull();
                     break;
                 case 3:
                     SetAllToFalse();
                     AddLineEnabled = true;
                     break;
             }
+
+            Redraw();
         }
     }
 
@@ -147,6 +151,8 @@ public partial class PolysPageViewModel : ViewModelBase
         _poly = new Poly.Poly(new Size(_debuggableBitmapControl.GetBitmapWidth(),
             _debuggableBitmapControl.GetBitmapHeight()));
         SelectedPolyIndex = 0;
+        NormsEnabled = true;
+        BuildEnabled = true;
         PointInfo = new PointInfo();
         IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
@@ -169,16 +175,10 @@ public partial class PolysPageViewModel : ViewModelBase
         var points = WaypointModel.ToPixels(Waypoints.ToList(), canvasSize);
         var newPoints = Graham.Draw(points);
 
-        var poly = new Poly.Poly(canvasSize, newPoints);
-        poly.Close(null);
-        _debuggableBitmapControl.ClearBitmap();
-        var pixels = poly.Draw();
-        _debuggableBitmapControl.AddPoints(pixels);
-        if (!IsDebugEnabled)
-        {
-            _toastManager.ShowToast("Построена оболочка", $"Алгоритм: Грэхем.",
-                NotificationType.Success);
-        }
+        _poly.Clear();
+        _poly.AddRange(newPoints);
+        _poly.Close(null);
+        Redraw();
     }
 
     private void DrawJarvis()
@@ -188,14 +188,10 @@ public partial class PolysPageViewModel : ViewModelBase
         var points = WaypointModel.ToPixels(Waypoints.ToList(), canvasSize);
         var newPoints = Jarvis.Draw(points);
 
-        var poly = new Poly.Poly(canvasSize, newPoints);
-        poly.Close(null);
-        _debuggableBitmapControl.ClearBitmap();
-        var pixels = poly.Draw();
-        _debuggableBitmapControl.AddPoints(pixels);
-        if (!IsDebugEnabled)
-            _toastManager.ShowToast("Построена оболочка", $"Алгоритм: Джарвис.",
-                NotificationType.Success);
+        _poly.Clear();
+        _poly.AddRange(newPoints);
+        _poly.Close(null);
+        Redraw();
     }
 
     [RelayCommand]
@@ -209,13 +205,16 @@ public partial class PolysPageViewModel : ViewModelBase
     {
         var newWaypoint = new WaypointModel { X = center.X, Y = center.Y };
         Waypoints.Add(newWaypoint);
-        _poly.AddPoint(newWaypoint);
+        
+        if (BuildEnabled) _poly.AddPoint(newWaypoint);
+        else if (HullBuildEnabled) BuildHull();
         Redraw();
     }
 
     [RelayCommand]
     private void WaypointClicked(WaypointModel? model)
     {
+        if (!BuildEnabled) return;
         _poly.Close(model);
         Redraw();
     }
@@ -230,7 +229,8 @@ public partial class PolysPageViewModel : ViewModelBase
     [RelayCommand]
     private void WaypointDragged(WaypointModel? model)
     {
-        Redraw();
+        if (!BuildEnabled && HullBuildEnabled) BuildHull();
+        else Redraw();
     }
 
     [RelayCommand]
@@ -252,11 +252,12 @@ public partial class PolysPageViewModel : ViewModelBase
         }
         else
         {
-            var pixels =  BrezenhemLineGenerator.DrawLine(_firstPoint, new Pixel(x, y), 0xFF228B22);
+            var pixels = BrezenhemLineGenerator.DrawLine(_firstPoint, new Pixel(x, y), 0xFF228B22);
             Redraw();
             _debuggableBitmapControl.AddPoints(pixels);
-            if (!IsDebugEnabled) _toastManager.ShowToast("Нарисован отрезок", $"Пересечения с полигоном:",
-                NotificationType.Success);
+            if (!IsDebugEnabled)
+                _toastManager.ShowToast("Нарисован отрезок", $"Пересечения с полигоном:",
+                    NotificationType.Success);
             _firstPoint = null;
         }
     }
