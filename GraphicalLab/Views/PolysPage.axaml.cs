@@ -22,9 +22,4 @@ public partial class PolysPage : UserControl
     {
         (DataContext as PolysPageViewModel)?.HandleMoveCommand.Execute(e);
     }
-
-    private void Image_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        (DataContext as PolysPageViewModel)?.HandleClickCommand.Execute(e);
-    }
 }

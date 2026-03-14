@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphicalLab.Lines;
 using GraphicalLab.Models;
 
 namespace GraphicalLab.Poly;

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Avalonia;
-using GraphicalLab.Controls.WaypointControl;
 using GraphicalLab.Lines;
 using GraphicalLab.Models;
 

@@ -7,7 +7,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
-using Avalonia.Remote.Protocol.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Controls.WaypointControl;
@@ -205,9 +204,15 @@ public partial class PolysPageViewModel : ViewModelBase
     [RelayCommand]
     private void AddWaypoint(Point center)
     {
+        if (AddLineEnabled)
+        {
+            DrawLine(center);
+            return;
+        }
+
         var newWaypoint = new WaypointModel { X = center.X, Y = center.Y };
         Waypoints.Add(newWaypoint);
-        
+
         if (BuildEnabled) _poly.AddPoint(newWaypoint);
         else if (HullBuildEnabled) BuildHull();
         Redraw();
@@ -235,18 +240,14 @@ public partial class PolysPageViewModel : ViewModelBase
         else Redraw();
     }
 
-    [RelayCommand]
-    private void HandleClick(PointerPressedEventArgs e)
+    private void DrawLine(Point point)
     {
-        if (!AddLineEnabled) return;
-        var point = e.GetPosition(TargetImage);
         if (TargetImage is null) return;
 
-        double scale = TargetImage.Bounds.Width / BitmapWidth;
-        int x = (int)(point.X / scale);
-        int y = (int)(point.Y / scale);
+        int x = (int)(point.X * _debuggableBitmapControl.GetBitmapWidth());
+        int y = (int)(point.Y * _debuggableBitmapControl.GetBitmapHeight());
 
-        _debuggableBitmapControl.SetPixel(new Pixel(x, y));
+        _debuggableBitmapControl.SetPixel(new Pixel(x, y, 0xFF228B22));
 
         if (_firstPoint is null)
         {
@@ -254,12 +255,29 @@ public partial class PolysPageViewModel : ViewModelBase
         }
         else
         {
-            var pixels = BrezenhemLineGenerator.DrawLine(_firstPoint, new Pixel(x, y), 0xFF228B22);
-            Redraw();
+            var secondPoint = new Pixel(x, y);
+            var pixels = BrezenhemLineGenerator.DrawLine(_firstPoint, secondPoint, 0xFF228B22);
+            pixels.AddRange(_poly.Draw());
+
+            _debuggableBitmapControl.ClearBitmap();
             _debuggableBitmapControl.AddPoints(pixels);
+
+            var intersections =
+                IntersectionCalculator.FindAllIntersections(_firstPoint, secondPoint, _poly.EdgePointsToPixels());
+
             if (!IsDebugEnabled)
-                _toastManager.ShowToast("Нарисован отрезок", $"Пересечения с полигоном:",
-                    NotificationType.Success);
+            {
+                List<Pixel> intersectionPoints = [];
+                foreach (var intersection in intersections)
+                {
+                    _toastManager.ShowToast("Пересечение", intersection.ToString(), NotificationType.Information);
+                    intersection.Point.Color = 0xFF8B0000;
+                    intersectionPoints.Add(intersection.Point);
+                }
+                
+                _debuggableBitmapControl.AddPoints(intersectionPoints);
+            }
+
             _firstPoint = null;
         }
     }

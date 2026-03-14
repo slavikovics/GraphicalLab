@@ -9,5 +9,6 @@ public interface IWritableBitmapProvider
     void ClearBitmap();
     int GetBitmapWidth();
     int GetBitmapHeight();
+    uint[,] GetPixelMatrix();
     WriteableBitmap GetBitmap();
 }

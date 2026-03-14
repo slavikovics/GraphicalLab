@@ -144,7 +144,6 @@
                     <Image Name="Image"
                            Stretch="Uniform"
                            RenderOptions.BitmapInterpolationMode="None"
-                           PointerPressed="Image_OnPointerPressed"
                            Source="{Binding Bitmap}" />
 
                     <local:WayPointsOverlay ItemsSource="{Binding Waypoints}"

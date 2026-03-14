@@ -49,6 +49,25 @@ public class WritableBitmapProvider : IWritableBitmapProvider
         }
     }
     
+    public unsafe uint[,] GetPixelMatrix()
+    {
+        uint[,] matrix = new uint[_bitmapWidth, _bitmapHeight];
+    
+        using var fb = _bitmap.Lock();
+        uint* buffer = (uint*)fb.Address;
+        int stride = fb.RowBytes / 4;
+    
+        for (int y = 0; y < _bitmapHeight; y++)
+        {
+            for (int x = 0; x < _bitmapWidth; x++)
+            {
+                matrix[x, y] = buffer[y * stride + x];
+            }
+        }
+    
+        return matrix;
+    }
+    
     public int GetBitmapWidth()
     {
         return _bitmapWidth;
