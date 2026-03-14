@@ -5,10 +5,13 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
+using Avalonia.Input;
 using Avalonia.Media.Imaging;
+using Avalonia.Remote.Protocol.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Controls.WaypointControl;
+using GraphicalLab.Lines;
 using GraphicalLab.Models;
 using GraphicalLab.Poly;
 using GraphicalLab.Services.DebugControlService;
@@ -25,6 +28,7 @@ public partial class PolysPageViewModel : ViewModelBase
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
     public WriteableBitmap Bitmap => _debuggableBitmapControl.GetBitmap();
     public Image? TargetImage = null;
+    private Pixel? _firstPoint;
 
     [ObservableProperty] private bool _isNextStepAvailable;
     [ObservableProperty] private string _stepsCountText;
@@ -51,7 +55,8 @@ public partial class PolysPageViewModel : ViewModelBase
         }
     }
 
-    [ObservableProperty] private List<string> _polyTypes = ["Грэхем", "Джарвис"];
+    [ObservableProperty]
+    private List<string> _polyTypes = ["Построение", "Грэхем", "Джарвис", "Пересечение с отрезком"];
 
     private delegate void DrawPolyDelegate();
 
@@ -65,8 +70,55 @@ public partial class PolysPageViewModel : ViewModelBase
         _debuggableBitmapControl = debuggableBitmapControl;
         _debuggableBitmapControl.WritableBitmapChanged += UpdateImage;
         _debuggableBitmapControl.PropertyChanged += DebuggableBitmapControlOnPropertyChanged;
+        PropertyChanged += OnPropertyChanged;
         InitializePolys();
         InitializeProperties();
+    }
+
+    [ObservableProperty] private bool _normsEnabled;
+    [ObservableProperty] private bool _autoNorms;
+    [ObservableProperty] private bool _autoConnect;
+    [ObservableProperty] private bool _hullBuildEnabled;
+    [ObservableProperty] private bool _addLineEnabled;
+    [ObservableProperty] private ConvexResult _convexResult;
+    [ObservableProperty] private PointInfo _pointInfo;
+
+    private void SetAllToFalse()
+    {
+        NormsEnabled = false;
+        AutoNorms = false;
+        AutoConnect = false;
+        HullBuildEnabled = false;
+        AddLineEnabled = false;
+        _firstPoint = null;
+    }
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SelectedPolyIndex))
+        {
+            switch (SelectedPolyIndex)
+            {
+                case 0:
+                    SetAllToFalse();
+                    NormsEnabled = true;
+                    break;
+                case 1:
+                    SetAllToFalse();
+                    HullBuildEnabled = true;
+                    _poly.Clear();
+                    break;
+                case 2:
+                    SetAllToFalse();
+                    HullBuildEnabled = true;
+                    _poly.Clear();
+                    break;
+                case 3:
+                    SetAllToFalse();
+                    AddLineEnabled = true;
+                    break;
+            }
+        }
     }
 
     private void DebuggableBitmapControlOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -95,7 +147,7 @@ public partial class PolysPageViewModel : ViewModelBase
         _poly = new Poly.Poly(new Size(_debuggableBitmapControl.GetBitmapWidth(),
             _debuggableBitmapControl.GetBitmapHeight()));
         SelectedPolyIndex = 0;
-        AddWaypointEnabled = true;
+        PointInfo = new PointInfo();
         IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
         StepsCountText = _debuggableBitmapControl.StepsCountText;
@@ -105,8 +157,8 @@ public partial class PolysPageViewModel : ViewModelBase
     {
         _polyTypesMatch = new Dictionary<int, DrawPolyDelegate>
         {
-            { 0, DrawGraham },
-            { 1, DrawJarvis }
+            { 1, DrawGraham },
+            { 2, DrawJarvis }
         };
     }
 
@@ -123,8 +175,10 @@ public partial class PolysPageViewModel : ViewModelBase
         var pixels = poly.Draw();
         _debuggableBitmapControl.AddPoints(pixels);
         if (!IsDebugEnabled)
+        {
             _toastManager.ShowToast("Построена оболочка", $"Алгоритм: Грэхем.",
                 NotificationType.Success);
+        }
     }
 
     private void DrawJarvis()
@@ -142,35 +196,6 @@ public partial class PolysPageViewModel : ViewModelBase
         if (!IsDebugEnabled)
             _toastManager.ShowToast("Построена оболочка", $"Алгоритм: Джарвис.",
                 NotificationType.Success);
-    }
-
-    [ObservableProperty] private bool _addWaypointEnabled;
-    [ObservableProperty] private bool _addLineEnabled;
-    [ObservableProperty] private bool _pickPointEnabled;
-    [ObservableProperty] private ConvexResult _convexResult;
-
-    [RelayCommand]
-    private void AddPoint()
-    {
-        AddWaypointEnabled = false;
-        AddLineEnabled = true;
-        PickPointEnabled = true;
-    }
-
-    [RelayCommand]
-    private void AddLine()
-    {
-        AddWaypointEnabled = true;
-        AddLineEnabled = false;
-        PickPointEnabled = true;
-    }
-
-    [RelayCommand]
-    private void PickPoint()
-    {
-        AddWaypointEnabled = true;
-        AddLineEnabled = true;
-        PickPointEnabled = false;
     }
 
     [RelayCommand]
@@ -206,6 +231,49 @@ public partial class PolysPageViewModel : ViewModelBase
     private void WaypointDragged(WaypointModel? model)
     {
         Redraw();
+    }
+
+    [RelayCommand]
+    private void HandleClick(PointerPressedEventArgs e)
+    {
+        if (!AddLineEnabled) return;
+        var point = e.GetPosition(TargetImage);
+        if (TargetImage is null) return;
+
+        double scale = TargetImage.Bounds.Width / BitmapWidth;
+        int x = (int)(point.X / scale);
+        int y = (int)(point.Y / scale);
+
+        _debuggableBitmapControl.SetPixel(new Pixel(x, y));
+
+        if (_firstPoint is null)
+        {
+            _firstPoint = new Pixel(x, y);
+        }
+        else
+        {
+            var pixels =  BrezenhemLineGenerator.DrawLine(_firstPoint, new Pixel(x, y), 0xFF228B22);
+            Redraw();
+            _debuggableBitmapControl.AddPoints(pixels);
+            if (!IsDebugEnabled) _toastManager.ShowToast("Нарисован отрезок", $"Пересечения с полигоном:",
+                NotificationType.Success);
+            _firstPoint = null;
+        }
+    }
+
+    [RelayCommand]
+    private void HandleMove(PointerEventArgs e)
+    {
+        var position = e.GetPosition(TargetImage);
+        if (TargetImage is null) return;
+
+        double scale = TargetImage.Bounds.Width / BitmapWidth;
+        int x = (int)(position.X / scale);
+        int y = (int)(position.Y / scale);
+
+        var point = new Pixel(x, y);
+        PointInfo.Point = point;
+        PointInfo.IsInside = InsideChecker.IsInside(point, _poly.EdgePointsToPixels());
     }
 
     private void UpdateImage()

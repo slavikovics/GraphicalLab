@@ -14,6 +14,7 @@
              x:Class="GraphicalLab.Views.PolysPage">
     <UserControl.Resources>
         <poly:EnumToStringConverter x:Key="EnumToStringConverter" />
+        <poly:PointInfoToStringConverter x:Key="PointInfoToStringConverter" />
     </UserControl.Resources>
     <ScrollViewer>
         <StackPanel Spacing="10">
@@ -43,6 +44,7 @@
                                     Height="50"
                                     Width="50"
                                     Padding="3"
+                                    IsVisible="{Binding HullBuildEnabled}"
                                     Command="{Binding BuildHullCommand}">
                                 <avalonia:MaterialIcon Width="25"
                                                        HorizontalAlignment="Center"
@@ -50,44 +52,16 @@
                                                        Margin="3"
                                                        Kind="Hammer" />
                             </Button>
-                            <Button Margin="5 0"
-                                    Height="50"
-                                    Width="50"
-                                    Padding="3"
-                                    Command="{Binding AddPointCommand}"
-                                    IsEnabled="{Binding AddWaypointEnabled}">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3"
-                                                       Kind="PlusCircleOutline" />
-                            </Button>
-                            <Button Margin="5 0"
-                                    Height="50"
-                                    Width="50"
-                                    Padding="3"
-                                    Command="{Binding AddLineCommand}"
-                                    IsEnabled="{Binding AddLineEnabled}">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3"
-                                                       Kind="VectorLine" />
-                            </Button>
-                            <Button Margin="5 0 10 0"
-                                    Height="50"
-                                    Width="50"
-                                    Padding="3"
-                                    Command="{Binding PickPointCommand}"
-                                    IsEnabled="{Binding PickPointEnabled}">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3"
-                                                       Kind="VectorPoint" />
-                            </Button>
+                            
+                            <StackPanel Orientation="Horizontal"
+                                        IsVisible="{Binding NormsEnabled}"
+                                        Margin="10 15 0 10">
+                                <ToggleSwitch IsChecked="{Binding AutoNorms}" />
+                                <TextBlock VerticalAlignment="Center">Автонормали</TextBlock>
+                            </StackPanel>
 
                             <Button Margin="5 0 10 0"
+                                    IsVisible="{Binding NormsEnabled}"
                                     Height="50"
                                     Width="110"
                                     Padding="3"
@@ -102,9 +76,24 @@
                                 </StackPanel>
                             </Button>
 
-                            <TextBlock Margin="0 0 5 0"
+                            <avalonia:MaterialIcon Width="20"
+                                                   Height="20"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="White"
+                                                   Kind="VectorPolygon" />
+                            <TextBlock Margin="5 0"
                                        VerticalAlignment="Center"
                                        Text="{Binding ConvexResult, Converter={StaticResource EnumToStringConverter}}" />
+                            
+                            <avalonia:MaterialIcon Width="20"
+                                                   Height="20"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="White"
+                                                   Kind="VectorPoint" />
+                            <TextBlock Margin="5 0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding PointInfo.DisplayText}" />
+                            
                         </StackPanel>
                     </suki:GlassCard>
                 </Border>
@@ -161,11 +150,13 @@
                 </Border>
             </Grid>
             <Border Margin="10 0 5 10" BorderThickness="1"
+                    PointerMoved="Image_OnPointerMoved"
                     BorderBrush="#353535">
                 <Grid>
                     <Image Name="Image"
                            Stretch="Uniform"
                            RenderOptions.BitmapInterpolationMode="None"
+                           PointerPressed="Image_OnPointerPressed"
                            Source="{Binding Bitmap}" />
 
                     <local:WayPointsOverlay ItemsSource="{Binding Waypoints}"

@@ -8,23 +8,24 @@ public class EnumToStringConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
+        var placeholder = "Вид полигона: ";
         if (value == null)
-            return string.Empty;
+            return placeholder;
 
         switch (value as ConvexResult?)
         {
             case null:
-                return string.Empty;
+                return placeholder;
             case ConvexResult.AllNegative:
-                return "Выпуклый";
+                return placeholder + "Выпуклый";
             case ConvexResult.AllPositive:
-                return "Выпуклый";
+                return placeholder + "Выпуклый";
             case ConvexResult.AllZero:
-                return "Выроожден";
+                return placeholder + "Выроожден";
             case ConvexResult.Mixed:
-                return "Вогнутый";
+                return placeholder + "Вогнутый";
             default:
-                return value.ToString();
+                return placeholder + value;
         }
     }
 
