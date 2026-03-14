@@ -38,6 +38,18 @@
                             </TextBlock>
                             <ComboBox SelectedIndex="{Binding SelectedFillIndex}"
                                       ItemsSource="{Binding LineTypes}" />
+                            
+                            <Button Margin="5 0"
+                                    Height="50"
+                                    Width="50"
+                                    Padding="3"
+                                    Command="{Binding RedrawCommand}">
+                                <avalonia:MaterialIcon Width="25"
+                                                       HorizontalAlignment="Center"
+                                                       Height="25"
+                                                       Margin="3"
+                                                       Kind="Refresh" />
+                            </Button>
                         </StackPanel>
 
                     </suki:GlassCard>

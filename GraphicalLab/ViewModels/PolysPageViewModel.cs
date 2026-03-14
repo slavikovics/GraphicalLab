@@ -301,7 +301,7 @@ public partial class PolysPageViewModel : ViewModelBase
         TargetImage?.InvalidateVisual();
     }
 
-    private void Redraw()
+    public void Redraw()
     {
         List<Pixel> pixels = [];
         pixels.AddRange(Poly.Draw());

@@ -178,6 +178,13 @@ public partial class FillPageViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void Redraw()
+    {
+        _polysPageViewModel.Redraw();
+        UpdateImage();
+    }
+
+    [RelayCommand]
     public void ClearBitmap()
     {
         _debuggableBitmapControl.ClearBitmap();
