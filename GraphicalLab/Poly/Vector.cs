@@ -15,9 +15,6 @@ public struct Vector
 
     public static Vector operator -(Vector a, Vector b) => 
         new Vector(a.X - b.X, a.Y - b.Y);
-    
-    public static double Dot(Vector a, Vector b) => 
-        a.X * b.X + a.Y * b.Y;
 
     public Pixel ToPixel()
     {
