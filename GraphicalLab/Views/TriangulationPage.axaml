@@ -6,16 +6,10 @@
              xmlns:vm="using:GraphicalLab.ViewModels"
              xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
              xmlns:local="clr-namespace:GraphicalLab.Controls.WaypointControl"
-             xmlns:graphicalLab="clr-namespace:GraphicalLab"
              xmlns:controls="clr-namespace:GraphicalLab.Controls"
-             xmlns:poly="clr-namespace:GraphicalLab.Poly"
              x:DataType="vm:TriangulationPageViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="GraphicalLab.Views.TriangulationPage">
-    <UserControl.Resources>
-        <poly:EnumToStringConverter x:Key="EnumToStringConverter" />
-        <poly:PointInfoToStringConverter x:Key="PointInfoToStringConverter" />
-    </UserControl.Resources>
     <ScrollViewer>
         <StackPanel Spacing="10">
             <Grid>
@@ -33,55 +27,43 @@
                                     Height="70">
                         <StackPanel HorizontalAlignment="Center"
                                     Orientation="Horizontal">
-                            <avalonia:MaterialIcon Width="20"
-                                                   HorizontalAlignment="Right"
-                                                   Height="20"
-                                                   Margin="3"
-                                                   Kind="VectorCurve" />
-                            <ComboBox SelectedIndex="{Binding SelectedPolyIndex}"
-                                      ItemsSource="{Binding PolyTypes}" />
                             <Button Margin="5 0 15 0"
                                     Height="50"
-                                    Width="50"
+                                    Width="150"
                                     Padding="3"
-                                    IsVisible="{Binding HullBuildEnabled}"
-                                    Command="{Binding BuildHullCommand}">
-                                <avalonia:MaterialIcon Width="25"
-                                                       HorizontalAlignment="Center"
-                                                       Height="25"
-                                                       Margin="3 "
-                                                       Kind="Hammer" />
+                                    Command="{Binding TriangulationCommand}">
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center">
+                                    <avalonia:MaterialIcon Width="25"
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center"
+                                                           Height="25"
+                                                           Margin="3 "
+                                                           Kind="VectorTriangle" />
+                                    <TextBlock Text="Триангуляция"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
                             </Button>
-                            
-                            <StackPanel Orientation="Horizontal"
-                                        IsVisible="{Binding NormsEnabled}"
-                                        Margin="10 0 10 0">
-                                <avalonia:MaterialIcon Width="20"
-                                                       Height="20"
-                                                       Kind="AxisArrow" />
-                                <TextBlock Margin="5 0" VerticalAlignment="Center">Нормали:</TextBlock>
-                                <ToggleSwitch IsChecked="{Binding AutoNorms}" />
-                            </StackPanel>
 
-                            <avalonia:MaterialIcon Width="20"
-                                                   Height="20"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="White"
-                                                   Kind="VectorPolygon" />
-                            <TextBlock Margin="5 0"
-                                       VerticalAlignment="Center"
-                                       Text="{Binding ConvexResult, Converter={StaticResource EnumToStringConverter}}" />
-                            
-                            <avalonia:MaterialIcon Width="40"
-                                                   Margin="5 0 0 0"
-                                                   Height="40"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="White"
-                                                   Kind="VectorPoint" />
-                            <TextBlock 
-                                       VerticalAlignment="Center"
-                                       Text="{Binding PointInfo.DisplayText}" />
-                            
+                            <Button Margin="5 0 5 0"
+                                    Height="50"
+                                    Width="150"
+                                    Padding="3"
+                                    Command="{Binding VoronoiCommand}">
+                                <StackPanel Orientation="Horizontal"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center">
+                                    <avalonia:MaterialIcon Width="25"
+                                                           HorizontalAlignment="Center"
+                                                           Height="25"
+                                                           Margin="3 "
+                                                           Kind="HexagonMultipleOutline" />
+                                    <TextBlock Text="Вороной"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </suki:GlassCard>
                 </Border>
@@ -138,7 +120,6 @@
                 </Border>
             </Grid>
             <Border Margin="10 0 5 10" BorderThickness="1"
-                    PointerMoved="Image_OnPointerMoved"
                     BorderBrush="#353535">
                 <Grid>
                     <Image Name="Image"

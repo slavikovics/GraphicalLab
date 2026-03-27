@@ -17,9 +17,4 @@ public partial class TriangulationPage : UserControl
     {
         (DataContext as TriangulationPageViewModel)?.TargetImage = Image;
     }
-
-    private void Image_OnPointerMoved(object? sender, PointerEventArgs e)
-    {
-        (DataContext as TriangulationPageViewModel)?.HandleMoveCommand.Execute(e);
-    }
 }
