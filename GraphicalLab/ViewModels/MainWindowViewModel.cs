@@ -15,6 +15,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public TransformPageViewModel TransformPageViewModel { get; }
     public PolysPageViewModel PolysPageViewModel { get; }
     public FillPageViewModel FillPageViewModel { get; }
+    public TriangulationPageViewModel TriangulationPageViewModel { get; }
 
     public MainWindowViewModel(
         IToastManager toastManager,
@@ -23,7 +24,8 @@ public partial class MainWindowViewModel : ViewModelBase
         CurvesPageViewModel curvesPageViewModel,
         TransformPageViewModel transformPageViewModel,
         PolysPageViewModel polysPageViewModel,
-        FillPageViewModel fillPageViewModel)
+        FillPageViewModel fillPageViewModel,
+        TriangulationPageViewModel triangulationPageViewModel)
     {
         _toastManager = toastManager;
         LinesPageViewModel = linesPageViewModel;
@@ -32,6 +34,7 @@ public partial class MainWindowViewModel : ViewModelBase
         TransformPageViewModel = transformPageViewModel;
         PolysPageViewModel = polysPageViewModel;
         FillPageViewModel = fillPageViewModel;
+        TriangulationPageViewModel = triangulationPageViewModel;
     }
 
     [RelayCommand]

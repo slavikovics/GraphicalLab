@@ -123,6 +123,21 @@
                 </suki:SukiSideMenuItem.PageContent>
             </suki:SukiSideMenuItem>
             
+            <!-- Triangulation Page -->
+            
+            <suki:SukiSideMenuItem Header="Триангуляция">
+                <suki:SukiSideMenuItem.Icon>
+                    <avalonia:MaterialIcon Width="20"
+                                           Height="20"
+                                           VerticalAlignment="Center"
+                                           Foreground="White"
+                                           Kind="TriangleOutline" />
+                </suki:SukiSideMenuItem.Icon>
+                <suki:SukiSideMenuItem.PageContent>
+                    <ContentControl Content="{Binding TriangulationPageViewModel}"/>
+                </suki:SukiSideMenuItem.PageContent>
+            </suki:SukiSideMenuItem>
+            
         </suki:SukiSideMenu.Items>
     </suki:SukiSideMenu>
 </suki:SukiWindow>

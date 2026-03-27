@@ -54,5 +54,9 @@
         <DependentUpon>FillPage.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Views\TriangulationPage.axaml.cs">
+        <DependentUpon>TriangulationPage.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

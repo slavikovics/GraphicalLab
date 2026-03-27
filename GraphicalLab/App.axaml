@@ -36,6 +36,9 @@
         <DataTemplate DataType="vm:FillPageViewModel">
             <views:FillPage/>
         </DataTemplate>
+        <DataTemplate DataType="vm:TriangulationPageViewModel">
+            <views:TriangulationPage/>
+        </DataTemplate>
     </Application.DataTemplates>
 
     <Application.Styles>
