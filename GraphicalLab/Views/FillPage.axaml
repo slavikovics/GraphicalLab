@@ -32,10 +32,6 @@
                                                    Height="20"
                                                    Margin="5"
                                                    Kind="FormatPaint" />
-                            <TextBlock VerticalAlignment="Center"
-                                       Margin="5">
-                                Алгоритм заливки:
-                            </TextBlock>
                             <ComboBox SelectedIndex="{Binding SelectedFillIndex}"
                                       ItemsSource="{Binding LineTypes}" />
                             
