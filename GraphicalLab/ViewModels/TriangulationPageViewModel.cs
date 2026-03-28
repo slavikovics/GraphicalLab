@@ -1,20 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
-using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GraphicalLab.Controls.WaypointControl;
-using GraphicalLab.Lines;
-using GraphicalLab.Models;
-using GraphicalLab.Poly;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
+using GraphicalLab.Triangulation;
 
 namespace GraphicalLab.ViewModels;
 
@@ -22,12 +17,12 @@ public partial class TriangulationPageViewModel : ViewModelBase
 {
     private readonly IToastManager _toastManager;
     private readonly IDebuggableBitmapControl _debuggableBitmapControl;
+    private IDrawable? _drawable;
 
     public int BitmapWidth => _debuggableBitmapControl.GetBitmapWidth();
     public int BitmapHeight => _debuggableBitmapControl.GetBitmapHeight();
     public WriteableBitmap Bitmap => _debuggableBitmapControl.GetBitmap();
     public Image? TargetImage = null;
-    private Pixel? _firstPoint;
 
     [ObservableProperty] private bool _isNextStepAvailable;
     [ObservableProperty] private string _stepsCountText;
@@ -54,7 +49,6 @@ public partial class TriangulationPageViewModel : ViewModelBase
     }
 
     public ObservableCollection<WaypointModel> Waypoints { get; } = [];
-    public Poly.Poly Poly;
 
     public TriangulationPageViewModel(IToastManager toastManager, IDebuggableBitmapControl debuggableBitmapControl)
     {
@@ -88,8 +82,6 @@ public partial class TriangulationPageViewModel : ViewModelBase
     private void InitializeProperties()
     {
         IsGridVisible = _debuggableBitmapControl.IsGridVisible;
-        Poly = new Poly.Poly(new Size(_debuggableBitmapControl.GetBitmapWidth(),
-            _debuggableBitmapControl.GetBitmapHeight()));
         IsNextStepAvailable = _debuggableBitmapControl.IsNextStepAvailable;
         IsDebugEnabled = _debuggableBitmapControl.IsDebugEnabled;
         StepsCountText = _debuggableBitmapControl.StepsCountText;
@@ -98,7 +90,8 @@ public partial class TriangulationPageViewModel : ViewModelBase
     [RelayCommand]
     private void Triangulation()
     {
-        
+        _drawable = new TriangulationResult();
+        Redraw();
     }
 
     [RelayCommand]
@@ -112,14 +105,12 @@ public partial class TriangulationPageViewModel : ViewModelBase
     {
         var newWaypoint = new WaypointModel { X = center.X, Y = center.Y };
         Waypoints.Add(newWaypoint);
-        Poly.AddPoint(newWaypoint);
         Redraw();
     }
 
     [RelayCommand]
     private void WaypointClicked(WaypointModel? model)
     {
-        Poly.Close(model);
         Redraw();
     }
 
@@ -134,20 +125,20 @@ public partial class TriangulationPageViewModel : ViewModelBase
         TargetImage?.InvalidateVisual();
     }
 
-    public void Redraw()
+    private void Redraw()
     {
-        List<Pixel> pixels = [];
-        pixels.AddRange(Poly.Draw());
-
         _debuggableBitmapControl.ClearBitmap(true);
-        _debuggableBitmapControl.AddPoints(pixels);
+        var canvasSize = new Size(_debuggableBitmapControl.GetBitmapWidth(),
+            _debuggableBitmapControl.GetBitmapHeight());
+        var points = WaypointModel.ToPixels(Waypoints.ToList(), canvasSize);
+        var pixels = _drawable?.Draw(points);
+        if (pixels != null) _debuggableBitmapControl.AddPoints(pixels);
     }
 
     [RelayCommand]
-    public void ClearBitmap()
+    private void ClearBitmap()
     {
         Waypoints.Clear();
-        Poly.Clear();
         _debuggableBitmapControl.ClearBitmap();
     }
 
