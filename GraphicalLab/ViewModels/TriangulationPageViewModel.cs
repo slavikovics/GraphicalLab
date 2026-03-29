@@ -10,6 +10,8 @@ using GraphicalLab.Controls.WaypointControl;
 using GraphicalLab.Services.DebugControlService;
 using GraphicalLab.Services.ToastManagerService;
 using GraphicalLab.Triangulation;
+using GraphicalLab.Voronoi;
+using Point = Avalonia.Point;
 
 namespace GraphicalLab.ViewModels;
 
@@ -97,7 +99,8 @@ public partial class TriangulationPageViewModel : ViewModelBase
     [RelayCommand]
     private void Voronoi()
     {
-        
+        _drawable = new VoronoiResult();
+        Redraw();
     }
 
     [RelayCommand]
