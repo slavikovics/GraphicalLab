@@ -12,6 +12,7 @@ using GraphicalLab.Services.ToastManagerService;
 using GraphicalLab.Triangulation;
 using GraphicalLab.Voronoi;
 using Point = Avalonia.Point;
+using VoronoiResult = GraphicalLab.Voronoi.VoronoiResult;
 
 namespace GraphicalLab.ViewModels;
 
