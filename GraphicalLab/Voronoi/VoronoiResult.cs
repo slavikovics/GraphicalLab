@@ -35,7 +35,7 @@ public class VoronoiResult : IDrawable
             var segment = ClipEdge(edge, boundingBox, sites);
             if (segment != null)
             {
-                resultPixels.AddRange(BrezenhemLineGenerator.DrawLine(segment.Value.Start, segment.Value.End));
+                resultPixels.AddRange(XiaolinWuLineGenerator.DrawLine(segment.Value.Start, segment.Value.End));
             }
         }
 
