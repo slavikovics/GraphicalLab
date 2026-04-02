@@ -4,7 +4,8 @@ namespace GraphicalLab.Triangulation;
 
 public class Edge
 {
-    public Pixel A, B;
+    public readonly Pixel A;
+    public readonly Pixel B;
         
     public Edge(Pixel a, Pixel b)
     {

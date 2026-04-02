@@ -10,7 +10,7 @@ public class Triangulation
 {
     public static List<Triangle> Triangulate(List<Pixel> points)
     {
-        if (points.Count < 3) return new List<Triangle>();
+        if (points.Count < 3) return [];
 
         var triangles = new List<Triangle>();
         var liveEdges = new HashSet<Edge>();

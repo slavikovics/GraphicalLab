@@ -6,18 +6,13 @@ namespace GraphicalLab.Triangulation;
 
 public class Triangle
 {
-    public Pixel V1, V2, V3;
+    public readonly Pixel V1, V2, V3;
         
     public Triangle(Pixel v1, Pixel v2, Pixel v3)
     {
         V1 = v1;
         V2 = v2;
         V3 = v3;
-    }
-        
-    public bool ContainsVertex(Pixel p)
-    {
-        return V1 == p || V2 == p || V3 == p;
     }
 
     public List<Pixel> Draw()
