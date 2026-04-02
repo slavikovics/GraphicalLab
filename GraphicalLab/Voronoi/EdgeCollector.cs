@@ -4,7 +4,7 @@ namespace GraphicalLab.Voronoi;
 
 internal class EdgeCollector : IVoronoiOutput
 {
-    public List<Edge> CompletedEdges { get; } = new();
+    public List<Edge> CompletedEdges { get; } = [];
 
     public void OnBisectorCreated(Edge edge)
     {
